@@ -27,11 +27,12 @@ async function test() {
   let scenario = 0;
   let failed = false;
   const beta = 3;
+  browser.evaluate("let p;");
   for (const country of [ 'LCA', 'NGA', 'IND' ]) {
     for (const bed of [ 100, 100000, 100000000 ]) {
       let results = browser.evaluate(
         `
-        let p = createParameters(
+        p = createParameters(
           ${country}.population,
           ${country}.contactMatrix,
           [0],
@@ -39,8 +40,6 @@ async function test() {
           ${bed},
           ${bed}
         );
-        console.log(Object.getPrototypeOf(p));
-        console.log(Object.getPrototypeOf(p.withHorizon(0, 365)));
         runModel(
           createParameters(
             ${country}.population,
@@ -48,7 +47,9 @@ async function test() {
             [0],
             [${beta}],
             ${bed},
-            ${bed}
+            ${bed},
+            ${country}.S_0,
+            ${country}.E1_0,
           ).withHorizon(0, 365)
         );
         `
@@ -70,7 +71,6 @@ async function test() {
       scenario: ${scenario}
       country: ${country}
       capacity: ${bed}
-      r0: ${R0}
       tolerance: ${tolerance}
       `);
       if (!passed) {

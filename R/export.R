@@ -15,9 +15,11 @@ saved_default_parameters <- FALSE
 
 for (iso3c in names(countries)) {
   country <- countries[[iso3c]]
+
+  cpm <- squire:::parse_country_population_mixing_matrix(country = country)
   nimue_parameters <- nimue::get_nimue_parameters(
-    population = squire::get_population(country)$n,
-    contact_matrix_set = squire::get_mixing_matrix(country)
+    population = cpm$population,
+    contact_matrix_set = cpm$contact_matrix_set
   )
   odin_parameters <- do.call(parameters, nimue_parameters)
   eigenvalue <- nimue_parameters$R0 / odin_parameters$beta_set
@@ -25,7 +27,9 @@ for (iso3c in names(countries)) {
   write_json(
     list(
       population = odin_parameters$population,
-      contactMatrix = odin_parameters$contact_matrix_set,
+      contactMatrix = odin_parameters$mix_mat_set,
+      S_0 = odin_parameters$S_0,
+      E1_0 = odin_parameters$E1_0,
       eigenvalue = eigenvalue
     ),
     file.path(out_dir, paste0(iso3c, '.json')),
@@ -35,13 +39,18 @@ for (iso3c in names(countries)) {
   )
 
   if (!saved_default_parameters) {
-    default_parameters <- nimue_parameters
+    class(odin_parameters) <- NULL #remove class for serialisation
+    default_parameters <- odin_parameters
     default_parameters[c(
       'population',
-      'contact_matrix_set',
+      'mix_mat_set',
       'beta_set',
-      'hosp_bed_capacity',
-      'ICU_bed_capacity'
+      'hosp_beds',
+      'ICU_beds',
+      'tt_hosp_beds',
+      'tt_ICU_beds',
+      'S_0',
+      'E1_0'
     )] <- NULL
     write_json(
       default_parameters,
