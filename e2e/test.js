@@ -1,27 +1,12 @@
-import {
-  approxEqualArray
-} from './utils.js'
-
+import { approxEqualArray } from './utils.js';
 import { flattenNested } from '../src/utils.js';
 import json from '@rollup/plugin-json';
 
-const fs = require('fs')
-const webdriver = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
+const fs = require('fs');
+const Browser = require('zombie');
+const browser = new Browser();
 const rollup = require('rollup');
 const tolerance = 1e-4;
-
-let options = new chrome.Options();
-options.addArguments("--disable-dev-shm-usage");
-options.addArguments("--disable-gpu");
-options.addArguments("--disable-extensions");
-options.addArguments("--no-sandbox");
-options.addArguments("--headless");
-
-let driver = new webdriver.Builder()
-  .forBrowser('chrome')
-  .setChromeOptions(options)
-  .build();
 
 async function load() {
   let bundle = await rollup.rollup({
@@ -30,7 +15,7 @@ async function load() {
   });
   bundle = await bundle.generate({ format: 'es' });
   bundle = bundle.output[0].code;
-  return await driver.executeScript(
+  browser.evaluate(
   `var s=window.document.createElement('script');
       s.type = 'module';
       s.textContent = ${bundle};
@@ -41,64 +26,76 @@ async function load() {
 async function test() {
   let scenario = 0;
   let failed = false;
+  const beta = 3;
   for (const country of [ 'LCA', 'NGA', 'IND' ]) {
     for (const bed of [ 100, 100000, 100000000 ]) {
-      for (const R0 of [ 4, 3, 2, 1 ]) {
-        let beta = JSON.parse(
-          fs.readFileSync(`./data/pars_${scenario}.json`)
-        ).beta_set;
-        let results = await driver.executeScript(
-          `return runModel(
+      let results = browser.evaluate(
+        `
+        let p = createParameters(
+          ${country}.population,
+          ${country}.contactMatrix,
+          [0],
+          [${beta}],
+          ${bed},
+          ${bed}
+        );
+        console.log(Object.getPrototypeOf(p));
+        console.log(Object.getPrototypeOf(p.withHorizon(0, 365)));
+        runModel(
+          createParameters(
             ${country}.population,
             ${country}.contactMatrix,
-            [0, 50],
+            [0],
             [${beta}],
             ${bed},
-            ${bed},
-            0,
-            365
-          );`
-        )
-
-        const expected = JSON.parse(fs.readFileSync(
-          `./data/output_${scenario}.json`,
-          'utf8')
+            ${bed}
+          ).withHorizon(0, 365)
         );
+        `
+      )
 
-        let passed = approxEqualArray(
-          flattenNested(results.y),
-          flattenNested(expected),
-          tolerance
+      const expected = JSON.parse(fs.readFileSync(
+        `./data/output_${scenario}.json`,
+        'utf8')
+      );
+
+      let passed = approxEqualArray(
+        flattenNested(results.y),
+        flattenNested(expected),
+        tolerance
+      );
+
+      console.log(`
+      --------------------
+      scenario: ${scenario}
+      country: ${country}
+      capacity: ${bed}
+      r0: ${R0}
+      tolerance: ${tolerance}
+      `);
+      if (!passed) {
+        failed = true;
+        console.log('failed. Writing diagnostics');
+        // Write to file for diagnostics
+        const outPath = `./failure_${scenario}.json`
+        fs.writeFileSync(
+          outPath,
+          JSON.stringify(results.y, null, 4)
         );
-
-        console.log(`
-        --------------------
-        scenario: ${scenario}
-        country: ${country}
-        capacity: ${bed}
-        r0: ${R0}
-        tolerance: ${tolerance}
-        `);
-        if (!passed) {
-          failed = true;
-          console.log('failed. Writing diagnostics');
-          // Write to file for diagnostics
-          const outPath = `./failure_${scenario}.json`
-          fs.writeFileSync(
-            outPath,
-            JSON.stringify(results.y, null, 4)
-          );
-        } else {
-          console.log('passed');
-        }
-        scenario++;
+      } else {
+        console.log('passed');
       }
+      scenario++;
     }
   }
   return failed;
 }
 
 async function run() {
+  //await load();
+  await browser.visit(
+    `file://${__dirname}/test_site.html`
+  );
   await load();
   const failed = await test();
   process.exit(failed);

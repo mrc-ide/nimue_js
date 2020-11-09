@@ -36,6 +36,30 @@ describe('createParameters', function() {
     expect(unchanged).to.be.deep.equal(default_params);
   });
 
+  it('can export a different horizon to odin', function() {
+    const actual = createParameters(
+      stlucia.population,
+      stlucia.contactMatrix,
+      [0],
+      [3],
+      1000,
+      1000
+    ).withHorizon(0, 365);
+
+    const {
+      population,
+      tt_matrix,
+      mix_mat_set,
+      tt_beta,
+      beta_set,
+      hosp_bed_capacity,
+      ICU_bed_capacity,
+      ...unchanged
+    } = actual._toOdin();
+
+    expect(unchanged).to.be.deep.equal(default_params);
+  });
+
   it('parameterises beds correctly', function() {
     const actual = createParameters(
       stlucia.population,
