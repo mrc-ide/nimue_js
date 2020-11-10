@@ -7,7 +7,7 @@ RUN R -e 'install.packages( \
   c("V8", "odin", "deSolve", "jsonlite", "remotes"))'
 
 RUN R -e 'Sys.setenv(DOWNLOAD_STATIC_LIBV8 = 1); \
-  remotes::install_github(c("jeroen/V8", "mrc-ide/odin.js@feat/as_integer", \
+  remotes::install_github(c("jeroen/V8", "mrc-ide/odin.js", \
   "reside-ic/nimue@c2dbf59f7433fddb6e3fb362d8047daa1e14cd01"))'
 
 # Install node

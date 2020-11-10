@@ -22,7 +22,8 @@ describe('runModel', function() {
     // parameterise model for t between 0 and 1
     runModel(
       createParameters(
-        stlucia.population,
+        stlucia.S_0,
+        stlucia.E1_0,
         stlucia.contactMatrix,
         [0],
         [3],

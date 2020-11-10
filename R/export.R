@@ -19,14 +19,17 @@ for (iso3c in names(countries)) {
   cpm <- squire:::parse_country_population_mixing_matrix(country = country)
   nimue_parameters <- nimue::get_nimue_parameters(
     population = cpm$population,
-    contact_matrix_set = cpm$contact_matrix_set
+    contact_matrix_set = cpm$contact_matrix_set,
+    max_vaccine = 0,
+    tt_vaccine = 0,
+    seed = 42
   )
+  set.seed(nimue_parameters$seed)
   odin_parameters <- do.call(parameters, nimue_parameters)
   eigenvalue <- nimue_parameters$R0 / odin_parameters$beta_set
 
   write_json(
     list(
-      population = odin_parameters$population,
       contactMatrix = odin_parameters$mix_mat_set,
       S_0 = odin_parameters$S_0,
       E1_0 = odin_parameters$E1_0,
@@ -42,8 +45,11 @@ for (iso3c in names(countries)) {
     class(odin_parameters) <- NULL #remove class for serialisation
     default_parameters <- odin_parameters
     default_parameters[c(
-      'population',
       'mix_mat_set',
+      'population',
+      'tt_matrix',
+      'max_vaccine',
+      'tt_vaccine',
       'beta_set',
       'hosp_beds',
       'ICU_beds',

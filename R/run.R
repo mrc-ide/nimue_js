@@ -15,12 +15,18 @@ scenario <- 0
 
 for (country in countries) {
   for (bed in beds) {
-    population <- squire::get_population(country)$n
-    m <- squire::get_mixing_matrix(country)
+    cpm <- squire:::parse_country_population_mixing_matrix(country = country)
     output <- nimue::run(
-      population = population,
-      contact_matrix_set = m,
-      beta_set = beta
+      population = cpm$population,
+      contact_matrix_set = cpm$contact_matrix_set,
+      beta_set = beta,
+      max_vaccine = 0,
+      tt_vaccine = 0,
+      hosp_bed_capacity = bed,
+      tt_hosp_beds = 0,
+      ICU_bed_capacity = bed,
+      tt_ICU_beds = 0,
+      seed = 42
     )
 
     write_json(
@@ -28,6 +34,17 @@ for (country in countries) {
       file.path(out_dir, paste0('output_', scenario, '.json')),
       pretty = TRUE,
       digits=NA
+    )
+
+    odin_parameters <- output$odin_parameters
+    class(odin_parameters) <- NULL #remove class for serialisation
+    write_json(
+      odin_parameters,
+      file.path(out_dir, paste0('pars_', scenario, '.json')),
+      pretty = TRUE,
+      digits = NA,
+      auto_unbox = TRUE,
+      matrix = 'columnmajor'
     )
 
     scenario <- scenario + 1

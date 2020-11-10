@@ -2,25 +2,31 @@ import default_params from '../data/default_parameters.json'
 import { wellFormedArray } from './utils.js'
 
 export const createParameters = (
-  population,
+  S_0,
+  E1_0,
   mixMatSet,
   ttBeta,
   betaSet,
   nBeds,
-  nICUBeds,
-  S_0,
-  E1_0
+  nICUBeds
 ) => {
-  //if (!wellFormedArray(mixMatSet, [population.length - 1, population.length - 1, 1])) {
-    //throw Error("mixMatSet must have the dimensions (nAge - 1) x (nAge - 1) x 1");
-  //}
+  const nAge = 17;
+  const nVaccine = 6;
 
-  //if (population.length !== mixMatSet[0].length) {
-    //throw Error("mismatch between population and mixing matrix size");
-  //}
+  if (!wellFormedArray(S_0, [nVaccine, nAge])) {
+    throw Error(`S_0 must have the dimensions ${nVaccine} x ${nAge}`);
+  }
 
-  if (!(Array.isArray(ttBeta) && Array.isArray(betaSet))) {
-    throw Error("ttBeta and betaSet must be arrays");
+  if (!wellFormedArray(E1_0, [nVaccine, nAge])) {
+    throw Error(`E1_0 must have the dimensions ${nVaccine} x ${nAge}`);
+  }
+
+  if (!wellFormedArray(mixMatSet, [nAge, nAge, 1])) {
+    throw Error(`mixMatSet must have the dimensions ${nAge} x ${nAge} x 1`);
+  }
+
+  if (!(nAge == mixMatSet[0].length && nAge == E1_0[0].length)) {
+    throw Error("mismatch between population and mixing matrix size");
   }
 
   if (ttBeta.length !== betaSet.length) {
@@ -32,7 +38,6 @@ export const createParameters = (
   }
 
   let parameters = {
-    population,
     mixMatSet,
     ttBeta,
     betaSet,
@@ -54,15 +59,15 @@ export const createParameters = (
     _toOdin: function() {
       return {
         ...default_params,
-        tt_matrix: [0],
         mix_mat_set: this.mixMatSet,
+        tt_matrix: [0],
         tt_beta: this.ttBeta,
         beta_set: this.betaSet,
         hosp_beds: [this.nBeds],
         tt_hosp_beds: [0],
         ICU_beds: [this.nICUBeds],
         tt_ICU_beds: [0],
-        max_vaccine: [1000],
+        max_vaccine: [0],
         tt_vaccine: [0],
         S_0: this.S_0,
         E1_0: this.E1_0

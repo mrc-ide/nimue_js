@@ -27,33 +27,25 @@ async function test() {
   let scenario = 0;
   let failed = false;
   const beta = 3;
-  browser.evaluate("let p;");
+  browser.evaluate("let p; let r;");
   for (const country of [ 'LCA', 'NGA', 'IND' ]) {
     for (const bed of [ 100, 100000, 100000000 ]) {
-      let results = browser.evaluate(
+      browser.evaluate(
         `
         p = createParameters(
-          ${country}.population,
+          ${country}.S_0,
+          ${country}.E1_0,
           ${country}.contactMatrix,
           [0],
           [${beta}],
           ${bed},
           ${bed}
-        );
-        runModel(
-          createParameters(
-            ${country}.population,
-            ${country}.contactMatrix,
-            [0],
-            [${beta}],
-            ${bed},
-            ${bed},
-            ${country}.S_0,
-            ${country}.E1_0,
-          ).withHorizon(0, 365)
-        );
+        ).withHorizon(0, 365);
         `
       )
+      let actual = browser.evaluate(
+        `r = { parameters: p._toOdin(), output: runModel(p) }; r`
+      );
 
       const expected = JSON.parse(fs.readFileSync(
         `./data/output_${scenario}.json`,
@@ -61,7 +53,7 @@ async function test() {
       );
 
       let passed = approxEqualArray(
-        flattenNested(results.y),
+        flattenNested(actual.output.y),
         flattenNested(expected),
         tolerance
       );
@@ -77,10 +69,15 @@ async function test() {
         failed = true;
         console.log('failed. Writing diagnostics');
         // Write to file for diagnostics
-        const outPath = `./failure_${scenario}.json`
+        const outPath = `.data/failure_${scenario}.json`;
         fs.writeFileSync(
           outPath,
-          JSON.stringify(results.y, null, 4)
+          JSON.stringify(actual.output.y, null, 4)
+        );
+        const outParsPath = `.data/failure_${scenario}_pars.json`;
+        fs.writeFileSync(
+          outParsPath,
+          JSON.stringify(actual.parameters, null, 4)
         );
       } else {
         console.log('passed');
@@ -92,7 +89,6 @@ async function test() {
 }
 
 async function run() {
-  //await load();
   await browser.visit(
     `file://${__dirname}/test_site.html`
   );
