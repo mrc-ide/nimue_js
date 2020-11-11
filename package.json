@@ -1,0 +1,36 @@
+{
+  "name": "nimue_js",
+  "version": "1.0.0",
+  "description": "A javascript implementation of the nimue COVID-19 model",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -r esm",
+    "test:watch": "nodemon --watch . --exec 'npm test || true'",
+    "build:data": "Rscript ./R/export.R ./data && Rscript ./R/run.R ./data",
+    "build:odin": "Rscript ./R/bundle.R vaccine.R build/nimue.js",
+    "attach_interface": "rollup -c >> build/nimue.js",
+    "build": "npm run build:data && npm run build:odin && npm run attach_interface",
+    "e2e": "node -r esm e2e/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/mrc-ide/nimue_js"
+  },
+  "author": "Imperial College London",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@rollup/plugin-json": "^4.0.2",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "chai": "^4.2.0",
+    "esm": "^3.2.25",
+    "mocha": "^7.1.1",
+    "nodemon": "^2.0.3",
+    "rollup": "^2.6.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "sinon": "^9.0.2",
+    "zombie": "^6.1.4"
+  },
+  "dependencies": {}
+}

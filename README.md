@@ -1,5 +1,4 @@
-![Unit tests](https://github.com/mrc-ide/nimue_js/workflows/test/badge.svg?branch=master)
-![Browser tests](https://github.com/mrc-ide/nimue_js/workflows/e2e/badge.svg?branch=master)
+![Tests](https://github.com/mrc-ide/nimue_js/workflows/test/badge.svg?branch=master)
 
 # nimue.js
 
@@ -44,7 +43,8 @@ createParameters takes the minimum info to create a parameter set for the model.
 
 ```js
 function createParameters(
-  population,
+  S_0,
+  E1_0,
   contactMatrix,
   ttBeta,
   betaSet,
@@ -55,7 +55,10 @@ function createParameters(
 
 The arguments are:
 
-  * population - is an array of population sizes for each of the 17 age groups
+  * S_0 - is an array of initial sizes for for the susceptible population in
+    each of the 17 age groups
+  * E1_0 - is an array of initial number of latent infections in
+    each of the 17 age groups
   * contactMatrix - is the 17 x 17 contact matrix between age groups
   * ttBeta - is an array of timesteps at which the beta value will change
   * betaSet - is an array of beta values that will change in line with `ttBeta`.
@@ -64,7 +67,7 @@ The arguments are:
 
 The default parameter set models 250 timesteps with no vaccination.
 
-#### Optional parameters (to be implemented)
+#### Optional parameters
 
 createParameters returns an object with methods for further parameterisation.
 
@@ -77,6 +80,7 @@ than or equal to `start`.
 
 
 ```js
+//not yet implemented
 Parameters.withMaxVaccine(timesteps = [0], maxVaccines = [0]);
 ```
 
@@ -85,6 +89,7 @@ timestep in `timesteps` the corresponding number of `maxVaccines` will be made
 available. The `timesteps` and `maxVaccines` arrays must be the same size.
 
 ```js
+//not yet implemented
 Parameters.withVaccineEfficacy(diseaseEfficacy = .95, infectionEfficacy = .95)
 ```
 
@@ -96,6 +101,7 @@ individual infecting someone else.
 
 
 ```js
+//not yet implemented
 Parameters.withVaccineTarget(vaccineTarget = Array(17).fill(1));
 ```
 
@@ -103,7 +109,7 @@ This models an age-specific targeting of the vaccine. `vaccineTarget` is an
 array representing the proportion of each age group who are eligible for any
 available vaccines.
 
-### Running the model (to be implemented)
+### Running the model
 
 `runModel` takes parameter sets from the previous section and produces model
 outputs.
@@ -154,7 +160,7 @@ Y is a 2D array representing the rows of the table.
 
 Here we show how some example scenarios can be coded up:
 
-### No vaccination (to be implemented)
+### No vaccination
 
 The default parameters will model 250 timesteps of the simulation, with no
 vaccination.
@@ -167,7 +173,8 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.population,
+    nigeriaData.S_0,
+    nigeriaData.E1_0,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -189,7 +196,8 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.population,
+    nigeriaData.S_0,
+    nigeriaData.E1_0,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -209,7 +217,8 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.population,
+    nigeriaData.S_0,
+    nigeriaData.E1_0,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -233,7 +242,8 @@ const target = [
 ];
 const results = runModel(
   createParameters(
-    nigeriaData.population,
+    nigeriaData.S_0,
+    nigeriaData.E1_0,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -243,7 +253,7 @@ const results = runModel(
 );
 ```
 
-### Estimating Rt and Reff (to be implemented)
+### Estimating Rt and Reff
 
 You can estimate Rt by multiplying your beta values by the country's eigenvalue:
 
@@ -257,13 +267,16 @@ Reff is the Rt after having accounted for decreased transmission due to
 immunity:
 
 ```js
+// NOTE: not yet implemented
+
 // run the model with a simple vaccine strategy
 
 import nigeriaData from './data/NGA.json';
 const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const parameters = createParameters(
-  nigeriaData.population,
+  nigeriaData.S_0,
+  nigeriaData.E1_0,
   nigeriaData.contactMatrix,
   ttBeta,
   beta,

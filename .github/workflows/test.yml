@@ -1,0 +1,18 @@
+name: test
+
+on: [push]
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Build docker image
+        run: docker build . -t nimue-js
+      - name: Run unit tests
+        run: docker run --rm -v "$GITHUB_WORKSPACE":/opt -w /opt nimue-js bash -c "npm install && npm run build && npm run test"
+      - name: Run e2e tests
+        run: docker run --rm -v "$GITHUB_WORKSPACE":/opt -w /opt nimue-js npm run e2e
