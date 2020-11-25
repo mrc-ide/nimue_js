@@ -94,10 +94,8 @@ Parameters.withVaccineEfficacy(diseaseEfficacy = .95, infectionEfficacy = .95)
 ```
 
 This models the efficacy of the vaccine in the simulation. `diseaseEfficacy`
-is a value between 0 and 1 representing the likelihood of a vaccinated
-individual contracting the disease. `infectionEfficacy`
-is a value between 0 and 1 representing the likelihood of a vaccinated
-individual infecting someone else.
+is a value between 0 and 1 that reduces the rate of hospitalisation $\phi(a)$ by a constant factor, influencing the proportion of cases that are severe. `infectionEfficacy`
+is a value between 0 and 1 that reduces the transmission parameter ($\beta$) by a constant factor, influencing the probability of infection.
 
 
 ```js
