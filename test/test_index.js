@@ -1,4 +1,5 @@
 import { runModel, createParameters } from "../src/index.js"
+import * as odin from '../build/nimue_odin.js';
 import { expect } from 'chai'
 
 import sinon from 'sinon'
@@ -17,7 +18,7 @@ describe('runModel', function() {
       }
     }
 
-    global.odin = [ model ];
+    const modelStub = sinon.stub(odin, 'getModel').callsFake(() => model);
 
     // parameterise model for t between 0 and 1
     runModel(

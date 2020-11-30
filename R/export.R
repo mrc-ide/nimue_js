@@ -15,24 +15,57 @@ saved_default_parameters <- FALSE
 
 for (iso3c in names(countries)) {
   country <- countries[[iso3c]]
+  set.seed(42)
 
-  cpm <- squire:::parse_country_population_mixing_matrix(country = country)
-  nimue_parameters <- nimue::get_nimue_parameters(
-    population = cpm$population,
-    contact_matrix_set = cpm$contact_matrix_set,
+  vaccine_params <- nimue:::default_vaccine_pars()
+  default_durations <- squire:::default_durations()
+
+  parameters <- nimue:::parameters(
+    country = country,
+    seeding_cases = 20,
+
+    # Durations
+    dur_E = default_durations$dur_E,
+    dur_IMild = default_durations$dur_IMild,
+    dur_ICase = default_durations$dur_ICase,
+
+    dur_get_ox_survive = default_durations$dur_get_ox_survive,
+    dur_get_ox_die = default_durations$dur_get_ox_die,
+    dur_not_get_ox_survive = default_durations$dur_not_get_ox_survive,
+    dur_not_get_ox_die = default_durations$dur_not_get_ox_die,
+
+    dur_get_mv_survive = default_durations$dur_get_mv_survive,
+    dur_get_mv_die = default_durations$dur_get_mv_die,
+    dur_not_get_mv_survive = default_durations$dur_not_get_ox_survive,
+    dur_not_get_mv_die = default_durations$dur_not_get_mv_die,
+
+    dur_rec = default_durations$dur_rec,
+    dur_R = vaccine_params$dur_R,
+
+    # Vaccine
+    dur_V = vaccine_params$dur_V,
+    vaccine_efficacy_infection = vaccine_params$vaccine_efficacy_infection,
+    vaccine_efficacy_disease = vaccine_params$vaccine_efficacy_disease,
     max_vaccine = 0,
     tt_vaccine = 0,
-    seed = 42
+    dur_vaccine_delay = vaccine_params$dur_vaccine_delay,
+    vaccine_coverage_mat = vaccine_params$vaccine_coverage_mat,
+
+    # Health system capacity
+    hosp_bed_capacity = 0,
+    ICU_bed_capacity = 0,
+    tt_hosp_beds = 0,
+    tt_ICU_beds = 0
   )
-  set.seed(nimue_parameters$seed)
-  odin_parameters <- do.call(parameters, nimue_parameters)
-  eigenvalue <- nimue_parameters$R0 / odin_parameters$beta_set
+
+  default_r0 <- 3
+  eigenvalue <- default_r0 / parameters$beta_set
 
   write_json(
     list(
-      contactMatrix = odin_parameters$mix_mat_set,
-      S_0 = odin_parameters$S_0,
-      E1_0 = odin_parameters$E1_0,
+      contactMatrix = parameters$mix_mat_set,
+      S_0 = parameters$S_0,
+      E1_0 = parameters$E1_0,
       eigenvalue = eigenvalue
     ),
     file.path(out_dir, paste0(iso3c, '.json')),
@@ -42,10 +75,11 @@ for (iso3c in names(countries)) {
   )
 
   if (!saved_default_parameters) {
-    class(odin_parameters) <- NULL #remove class for serialisation
-    default_parameters <- odin_parameters
+    class(parameters) <- NULL #remove class for serialisation
+    default_parameters <- parameters
     default_parameters[c(
       'mix_mat_set',
+      'contact_matrix_set',
       'population',
       'tt_matrix',
       'max_vaccine',
