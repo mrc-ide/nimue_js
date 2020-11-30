@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 export function approxEqualArray(x, y, tolerance) {
   if (y.length !== x.length) {
     throw Error("Incompatible arrays");
@@ -23,4 +25,18 @@ export function approxEqualArray(x, y, tolerance) {
     xy /= scale;
   }
   return xy < tolerance;
+}
+
+export function expectMatrixEqual(x, y, tolerance=1e-4) {
+  expect(x.length).to.be.equal(y.length);
+  expect(x[0].length).to.be.equal(y[0].length);
+  for (let i = 0; i < x.length; i++) {
+    for (let j = 0; j < x[0].length; j++) {
+      expect(x[i][j]).to.be.closeTo(
+        y[i][j],
+        tolerance,
+        `matrix index ${i}, ${j} is off by ${i - j}`
+      )
+    }
+  }
 }

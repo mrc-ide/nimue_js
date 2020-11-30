@@ -1,4 +1,4 @@
-import { approxEqualArray } from './utils.js';
+import { approxEqualArray } from '../test/utils.js';
 import { flattenNested } from '../src/utils.js';
 import json from '@rollup/plugin-json';
 

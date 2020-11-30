@@ -1,4 +1,4 @@
-import default_params from '../data/default_parameters.json'
+import defaultParams from '../data/default_parameters.json'
 import { wellFormedArray } from './utils.js'
 
 export const createParameters = (
@@ -47,6 +47,10 @@ export const createParameters = (
     E1_0,
     timeStart: 0,
     timeEnd: 250,
+    ttVaccines: [0],
+    maxVaccines: [0],
+    infectionEfficacy: defaultParams.vaccine_efficacy_infection,
+    probHosp: defaultParams.prob_hosp,
     dt: 1,
     withHorizon: function(timeStart, timeEnd) {
       if (timeStart > timeEnd) {
@@ -56,9 +60,36 @@ export const createParameters = (
       this.timeEnd = timeEnd;
       return this;
     },
+    withMaxVaccine: function(timesteps, maxVaccines) {
+      if (timesteps.length != maxVaccines.length) {
+        throw Error("timesteps and maxVaccines need to be the same size");
+      }
+      this.ttVaccines = timesteps;
+      this.maxVaccines = maxVaccines;
+      return this;
+    },
+    withVaccineEfficacy: function(diseaseEfficacy, infectionEfficacy) {
+      if (!(diseaseEfficacy >= 0 && diseaseEfficacy <= 1)) {
+        throw Error("diseaseEfficacy needs to be >= 0 and <= 1");
+      }
+      if (!(infectionEfficacy >= 0 && infectionEfficacy <= 1)) {
+        throw Error("infectionEfficacy needs to be >= 0 and <= 1");
+      }
+      const vaccinatedProbHosp = defaultParams.prob_hosp[0].map(
+        i => i * (1 - diseaseEfficacy)
+      );
+      const vaccinatedInfectedEff = Array(
+        defaultParams.vaccine_efficacy_infection[0].length
+      ).fill(1 - infectionEfficacy);
+      this.probHosp[3] = vaccinatedProbHosp;
+      this.probHosp[4] = vaccinatedProbHosp;
+      this.infectionEfficacy[3] = vaccinatedInfectedEff;
+      this.infectionEfficacy[4] = vaccinatedInfectedEff;
+      return this;
+    },
     _toOdin: function() {
       return {
-        ...default_params,
+        ...defaultParams,
         mix_mat_set: this.mixMatSet,
         tt_matrix: [0],
         tt_beta: this.ttBeta,
@@ -67,11 +98,13 @@ export const createParameters = (
         tt_hosp_beds: [0],
         ICU_beds: [this.nICUBeds],
         tt_ICU_beds: [0],
-        max_vaccine: [0],
-        tt_vaccine: [0],
+        max_vaccine: this.maxVaccines,
+        tt_vaccine: this.ttVaccines,
+        prob_hosp: this.probHosp,
+        vaccine_efficacy_infection: this.infectionEfficacy,
         S_0: this.S_0,
         E1_0: this.E1_0
-      }
+      };
     }
   };
   return parameters;
