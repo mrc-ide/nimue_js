@@ -63,7 +63,12 @@ for (iso3c in names(countries)) {
 
   write_json(
     list(
+      population = parameters$population,
       contactMatrix = parameters$mix_mat_set,
+      contactMatrixScaledAge = squire:::process_contact_matrix_scaled_age(
+        parameters$contact_matrix_set[[1]],
+        parameters$population
+      ),
       S_0 = parameters$S_0,
       E1_0 = parameters$E1_0,
       eigenvalue = eigenvalue
@@ -92,6 +97,10 @@ for (iso3c in names(countries)) {
       'S_0',
       'E1_0'
     )] <- NULL
+    default_parameters <- c(
+      default_parameters,
+      default_durations[c('dur_ICase', 'dur_IMild')]
+    )
     write_json(
       default_parameters,
       file.path(out_dir, 'default_parameters.json'),

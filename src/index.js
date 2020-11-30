@@ -14,3 +14,4 @@ export const runModel = function(parameters) {
 };
 
 export { createParameters } from './parameters.js';
+export { reff } from './reff.js';
