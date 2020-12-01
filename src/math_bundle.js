@@ -17,7 +17,12 @@ import {
   maxDependencies,
   absDependencies,
   sumDependencies,
-  dotDependencies
+  dotDependencies,
+  reshapeDependencies,
+  sizeDependencies,
+  concatDependencies,
+  zerosDependencies,
+  applyDependencies
 } from 'mathjs';
 
 export const {
@@ -37,7 +42,12 @@ export const {
   max,
   abs,
   sum,
-  dot
+  dot,
+  reshape,
+  size,
+  concat,
+  zeros,
+  apply
 } = create({
   addDependencies,
   dotDivideDependencies,
@@ -55,5 +65,10 @@ export const {
   maxDependencies,
   absDependencies,
   sumDependencies,
-  dotDependencies
+  dotDependencies,
+  reshapeDependencies,
+  sizeDependencies,
+  concatDependencies,
+  zerosDependencies,
+  applyDependencies
 }, { randomSeed: 42 })

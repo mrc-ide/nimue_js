@@ -11,22 +11,29 @@ import {
   transpose,
   multiply,
   subtract,
-  squeeze
+  squeeze,
+  reshape,
+  size,
+  concat,
+  zeros,
+  apply,
+  sum
 } from './math_bundle.js';
 
 import pars from '../data/default_parameters.json'
 
-const S_INDEX = range(1, 18);
+const S_INDEX = range(18, 120);
+const N_VACCINE_STATES = 6;
 
 function rowDivide(m, a) {
-  return m.map(row => dotDivide(row, a))
+  return m.map(row => dotDivide(row, a));
 }
 
 function rowMultiply(m, a) {
-  return m.map(row => dotMultiply(row, a))
+  return m.map(row => dotMultiply(row, a));
 }
 
-export function reff(output, rt, beta, population, mixingMatrix, tSubset = null) {
+export function reff(output, beta, population, mixingMatrix, tSubset = null) {
   if (!wellFormedArray(mixingMatrix, [population.length, population.length])) {
     throw Error("mixMatSet must have the dimensions nAge x nAge");
   }
@@ -35,14 +42,9 @@ export function reff(output, rt, beta, population, mixingMatrix, tSubset = null)
     throw Error("mismatch between population and mixing matrix size");
   }
 
-  if (beta.length !== rt.length) {
-    throw Error("mismatch between rt and beta size");
-  }
-
   if (tSubset == null) {
-    tSubset = [...Array(rt.length).keys()];
+    tSubset = [...Array(beta.length).keys()];
   } else {
-    rt = subset(rt, index(tSubset));
     beta = subset(beta, index(tSubset));
   }
 
@@ -50,26 +52,38 @@ export function reff(output, rt, beta, population, mixingMatrix, tSubset = null)
   output = squeeze(output);
   population = squeeze(population);
 
-  const propSusc = rowDivide(
-    subset(output, index(tSubset, S_INDEX)),
-    population
+  let propSusc = reshape(
+    rowDivide(
+      // get the susceptible counts for the current time horizion
+      subset(output, index(tSubset, S_INDEX)),
+      // divide by the total population size (copy 6 times for each vaccine
+      // state)
+      concat(...Array(N_VACCINE_STATES).fill(0).map(() => population))
+    ),
+    // reshape to match prob_hosp shape
+    [size(tSubset)[0], N_VACCINE_STATES, population.length]
   )
 
-  const relativeR0 = add(
-    multiply(pars.prob_hosp, pars.dur_ICase),
-    multiply(subtract(1, pars.prob_hosp), pars.dur_IMild)
+  // exclude vaccinated compartments
+  propSusc = subset(
+    propSusc,
+    index(range(0, propSusc.length), [2, 3], range(0, population.length)),
+    zeros([propSusc.length, 2, population.length])
   );
 
-  const adjustedEigens = tSubset.map((_, i) => {
+  const relativeR0 = add(
+    dotMultiply(pars.prob_hosp, pars.dur_ICase),
+    dotMultiply(subtract(1, pars.prob_hosp), pars.dur_IMild)
+  );
+
+  const adjustedEigens = propSusc.map((_, i) => {
     return leadingEigenvalue(
       rowMultiply(
-        rowMultiply(mixingMatrix, propSusc[i]),
-        relativeR0
+        mixingMatrix,
+        apply(dotMultiply(propSusc[i], relativeR0), 0, sum)
       )
     );
   });
 
-  const ratios = dotDivide(dotMultiply(beta, adjustedEigens), rt);
-
-  return dotMultiply(rt, ratios);
+  return dotMultiply(beta, adjustedEigens);
 }

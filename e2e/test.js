@@ -89,8 +89,7 @@ async function test() {
       const reff = browser.evaluate(
         `reff(
           r.output.y,
-          [${4}],
-          [${beta[0]}],
+          [${beta}],
           ${country}.population,
           ${country}.contactMatrixScaledAge
         )
