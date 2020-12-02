@@ -80,16 +80,14 @@ than or equal to `start`.
 
 
 ```js
-//not yet implemented
 Parameters.withMaxVaccine(timesteps = [0], maxVaccines = [0]);
 ```
 
-This models changes in the number of available vaccines over time. At each
+This models changes in the number of vaccines available each day. At each
 timestep in `timesteps` the corresponding number of `maxVaccines` will be made
 available. The `timesteps` and `maxVaccines` arrays must be the same size.
 
 ```js
-//not yet implemented
 Parameters.withVaccineEfficacy(diseaseEfficacy = .95, infectionEfficacy = .95)
 ```
 
@@ -184,7 +182,7 @@ const results = runModel(
 
 Note: this package does not provide estimations of beta
 
-### Vaccines becoming available (to be implemented)
+### Vaccines becoming available
 
 We can simulate 100,000 vaccines becoming available at timestep 20.
 
@@ -205,7 +203,7 @@ const results = runModel(
 );
 ```
 
-### Vaccine profile (to be implemented)
+### Vaccine profile
 
 We can simulate a vaccine which only mitigates onward infection.
 
