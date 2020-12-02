@@ -18,15 +18,20 @@ get_immunity_ratios <- function(out, beta, t_now) {
   pop <- out$parameters$population
 
   # in here we work out each time point the number of individuals in each age category in
-  # the S compartment and then divide by the total population size in each age category
-  # to give the proportion susceptible at each time point.
-  # We also zero the vaccinated compartments
+  # the S compartment at each time point.
   susceptible <- array(
     out$output[seq(t_now),index$S,],
     dim=c(t_now, dim(index$S))
   )
+  # We divide by the total population
   prop_susc <- sweep(susceptible, 2, pop, FUN='/')
-  prop_susc[,,c(4, 5)] <- 0
+  # We multiply by the effect of vaccines on onward infectiousness
+  prop_susc <- sweep(
+    prop_susc,
+    c(2, 3),
+    out$odin_parameters$vaccine_efficacy_infection,
+    FUN='*'
+  )
 
   # Length 17 with relative R0 in each age category
   relative_R0_by_age <- prob_hosp*dur_ICase + (1-prob_hosp)*dur_IMild

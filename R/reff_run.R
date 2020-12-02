@@ -39,6 +39,14 @@ write_json(
 )
 
 write_json(
+  output$odin_parameters[c('prob_hosp', 'vaccine_efficacy_infection')],
+  file.path(out_dir, paste0('pars_reff.json')),
+  pretty = TRUE,
+  matrix = 'columnmajor',
+  digits=NA
+)
+
+write_json(
   get_immunity_ratios(output, beta, length(beta)),
   file.path(out_dir, paste0('output_reff.json')),
   pretty = TRUE,

@@ -1,4 +1,4 @@
-import { wellFormedArray } from './utils.js';
+import { arrayEqual } from './utils.js';
 import { leadingEigenvalue } from './eigenvalues.js';
 
 import {
@@ -33,9 +33,25 @@ function rowMultiply(m, a) {
   return m.map(row => dotMultiply(row, a));
 }
 
-export function reff(output, beta, population, mixingMatrix, tSubset = null) {
-  if (!wellFormedArray(mixingMatrix, [population.length, population.length])) {
+export function reffRaw(
+  output,
+  beta,
+  population,
+  mixingMatrix,
+  probHosp,
+  vaccineInfectionEfficacy,
+  tSubset = null
+) {
+  if (!arrayEqual(size(mixingMatrix), [population.length, population.length])) {
     throw Error("mixMatSet must have the dimensions nAge x nAge");
+  }
+
+  if (!arrayEqual(size(probHosp), [N_VACCINE_STATES, population.length])) {
+    throw Error("probHosp must have the dimensions nVaccine x nAge");
+  }
+
+  if (!arrayEqual(size(vaccineInfectionEfficacy), [N_VACCINE_STATES, population.length])) {
+    throw Error("vaccineInfectionEfficacy must have the dimensions nVaccine x nAge");
   }
 
   if (population.length !== mixingMatrix.length) {
@@ -60,20 +76,16 @@ export function reff(output, beta, population, mixingMatrix, tSubset = null) {
       // state)
       concat(...Array(N_VACCINE_STATES).fill(0).map(() => population))
     ),
-    // reshape to match prob_hosp shape
+    // reshape to match probHosp shape
     [size(tSubset)[0], N_VACCINE_STATES, population.length]
   )
 
-  // exclude vaccinated compartments
-  propSusc = subset(
-    propSusc,
-    index(range(0, propSusc.length), [3, 4], range(0, population.length)),
-    zeros([propSusc.length, 2, population.length])
-  );
+  // multiply by vaccine efficacy
+  propSusc = rowMultiply(propSusc, vaccineInfectionEfficacy);
 
   const relativeR0 = add(
-    dotMultiply(pars.prob_hosp, pars.dur_ICase),
-    dotMultiply(subtract(1, pars.prob_hosp), pars.dur_IMild)
+    dotMultiply(probHosp, pars.dur_ICase),
+    dotMultiply(subtract(1, probHosp), pars.dur_IMild)
   );
 
   const adjustedEigens = propSusc.map((_, i) => {

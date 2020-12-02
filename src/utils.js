@@ -27,3 +27,10 @@ export const wellFormedArray = function(array, dims) {
   }
   return array.length === dims[0];
 }
+
+export function arrayEqual(a, b) {
+  if (a.length != b.length) {
+    return false;
+  }
+  return a.every((v, i) => v === b[i]);
+}
