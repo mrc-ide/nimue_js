@@ -247,43 +247,30 @@ const results = runModel(
 );
 ```
 
-### Estimating Rt and Reff
+### Reff
 
-You can estimate Rt by multiplying your beta values by the country's eigenvalue:
-
-```js
-import nigeriaData from './data/NGA.json';
-const beta = [3, 2.8];
-const rt = beta.map(r => { return r * nigeriaData.eigenvalue });
-```
-
-Reff is the Rt after having accounted for decreased transmission due to
-immunity:
+We provide function to estimate Reff from model outputs:
 
 ```js
-// NOTE: not yet implemented
-
-// run the model with a simple vaccine strategy
-
-import nigeriaData from './data/NGA.json';
-const ttBeta  = [0, 10,  20,  30,  40 ];
-const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
-const parameters = createParameters(
-  nigeriaData.S_0,
-  nigeriaData.E1_0,
-  nigeriaData.contactMatrix,
-  ttBeta,
+function reff(
+  output,
   beta,
-  10000000000,
-  10000000000
-).withMaxVaccine([0, 20], [0, 100000]);
-
-const results = runModel(parameters);
-
-// pass the model output, parameters and eigenvalue to our utility function
-const reff = estimate_reff(results, parameters, nigeriaData.eigenvalue);
+  population,
+  parameters,
+  contactMatrixScaledAge,
+  tSubset = null
+)
 ```
 
-`estimate_reff` will return an object containing a timeseries of Reff. The
-`timestep` key will contain the timestep for every change in reff. The `value`
-key will contain the new value of `reff`.
+Parameters:
+
+ * output - the `y` component of the model output returned from runModel
+ * beta - an array with corresponding beta values for the first timesteps of the output
+ * population - an array with population counts for each age group (called `population` in the country json files)
+ * parameters - the parameters object from `getParameters`
+ * mixingMatrix - a 2D array representing an age scaled mixing matrix (called `contactMatrixScaledAge` in the country json files)
+ * tSubset - an array of timesteps to calculate Reff for
+
+This returns an array of Reff values for the output at the timesteps in `tSubset`.
+If `tSubset` is null, it will return Reff values for all the beta values
+given.
