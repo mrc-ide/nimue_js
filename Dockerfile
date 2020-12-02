@@ -8,7 +8,7 @@ RUN R -e 'install.packages( \
 
 RUN R -e 'Sys.setenv(DOWNLOAD_STATIC_LIBV8 = 1); \
   remotes::install_github(c("jeroen/V8", "mrc-ide/odin.js", \
-  "mrc-ide/nimue@c944e5a2cb69d907361300458272953dbbade516"))'
+  "reside-ic/nimue@prioritisation_matrices"))'
 
 # Install node
 RUN apt install -y curl
