@@ -67,7 +67,7 @@ export function reff(output, beta, population, mixingMatrix, tSubset = null) {
   // exclude vaccinated compartments
   propSusc = subset(
     propSusc,
-    index(range(0, propSusc.length), [2, 3], range(0, population.length)),
+    index(range(0, propSusc.length), [3, 4], range(0, population.length)),
     zeros([propSusc.length, 2, population.length])
   );
 

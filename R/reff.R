@@ -26,7 +26,7 @@ get_immunity_ratios <- function(out, beta, t_now) {
     dim=c(t_now, dim(index$S))
   )
   prop_susc <- sweep(susceptible, 2, pop, FUN='/')
-  prop_susc[,,c(3, 4)] <- 0
+  prop_susc[,,c(4, 5)] <- 0
 
   # Length 17 with relative R0 in each age category
   relative_R0_by_age <- prob_hosp*dur_ICase + (1-prob_hosp)*dur_IMild
