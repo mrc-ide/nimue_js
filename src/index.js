@@ -1,8 +1,8 @@
+import { getModel } from '../build/nimue_odin.js';
 
-//NOTE: this function expects odin to be loaded into the global scope
 export const runModel = function(parameters) {
 
-  const model = Object.values(odin)[0];
+  const model = getModel();
   const mod = new model(parameters._toOdin(), 'ignore');
   const { timeStart, timeEnd, dt } = parameters;
   let t = [];
