@@ -60,6 +60,27 @@ describe('createParameters', function() {
     expect(ICU_beds[0]).to.be.equal(3000);
   });
 
+  it('parameterises strategies correctly', function() {
+    const actual = createParameters(
+      stlucia.S_0,
+      stlucia.E1_0,
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      3000
+    ).withStrategy('all');
+
+    const {
+      vaccine_coverage_mat,
+      N_prioritisation_steps,
+      ...others
+    } = actual._toOdin();
+
+    expect(vaccine_coverage_mat).to.be.deep.equal(Array(17).fill([.8]));
+    expect(N_prioritisation_steps).to.be.equal(1);
+  });
+
   it('parameterises efficacy correctly', function() {
     const actual = createParameters(
       stlucia.S_0,

@@ -99,6 +99,15 @@ for (iso3c in names(countries)) {
       auto_unbox=TRUE,
       digits=NA
     )
+    write_json(
+      list(
+        all = nimue::strategy_matrix('All'),
+        elderly = nimue::strategy_matrix('Elderly')
+      ),
+      file.path(out_dir, 'strategies.json'),
+      matrix='columnmajor',
+      digits=NA
+    )
     saved_default_parameters <- TRUE
   }
 }
