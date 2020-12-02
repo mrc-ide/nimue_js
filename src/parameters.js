@@ -1,5 +1,6 @@
-import defaultParams from '../data/default_parameters.json'
-import { wellFormedArray } from './utils.js'
+import strategies from '../data/strategies.json';
+import defaultParams from '../data/default_parameters.json';
+import { wellFormedArray } from './utils.js';
 
 export const createParameters = (
   S_0,
@@ -49,6 +50,7 @@ export const createParameters = (
     timeEnd: 250,
     ttVaccines: [0],
     maxVaccines: [0],
+    nCoverageMat: defaultParams.vaccine_coverage_mat,
     infectionEfficacy: defaultParams.vaccine_efficacy_infection,
     probHosp: defaultParams.prob_hosp,
     dt: 1,
@@ -87,6 +89,13 @@ export const createParameters = (
       this.infectionEfficacy[4] = vaccinatedInfectedEff;
       return this;
     },
+    withStrategy: function(strategy) {
+      if (!strategies.hasOwnProperty(strategy)) {
+        throw Error(`Unknown strategy ${strategy}`);
+      }
+      this.nCoverageMat = strategies[strategy];
+      return this;
+    },
     _toOdin: function() {
       return {
         ...defaultParams,
@@ -103,7 +112,9 @@ export const createParameters = (
         prob_hosp: this.probHosp,
         vaccine_efficacy_infection: this.infectionEfficacy,
         S_0: this.S_0,
-        E1_0: this.E1_0
+        E1_0: this.E1_0,
+        vaccine_coverage_mat: this.nCoverageMat,
+        N_prioritisation_steps: this.nCoverageMat[0].length
       };
     }
   };

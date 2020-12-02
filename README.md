@@ -224,7 +224,7 @@ const results = runModel(
 );
 ```
 
-### Targeting an age group (to be implemented)
+### Targeting an age group
 
 We can simulate a strategy which targets only the elderly.
 
@@ -232,10 +232,6 @@ We can simulate a strategy which targets only the elderly.
 import nigeriaData from './data/NGA.json';
 const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
-const target = [
-  ...Array(12).fill(0), //filter out the young
-  ...Array(5).fill(1)   //include the 5 oldest age groups
-];
 const results = runModel(
   createParameters(
     nigeriaData.S_0,
@@ -245,7 +241,9 @@ const results = runModel(
     beta,
     10000000000,
     10000000000
-  ).withVaccineTarget(target)
+  )
+  .withMaxVaccine([0, 20], [0, 100000])
+  .withStrategy('elderly') // the two options here are 'elderly' and 'all'
 );
 ```
 
