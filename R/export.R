@@ -36,7 +36,7 @@ for (iso3c in names(countries)) {
 
     dur_get_mv_survive = default_durations$dur_get_mv_survive,
     dur_get_mv_die = default_durations$dur_get_mv_die,
-    dur_not_get_mv_survive = default_durations$dur_not_get_ox_survive,
+    dur_not_get_mv_survive = default_durations$dur_not_get_mv_survive,
     dur_not_get_mv_die = default_durations$dur_not_get_mv_die,
 
     dur_rec = default_durations$dur_rec,
