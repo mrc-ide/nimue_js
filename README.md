@@ -111,8 +111,11 @@ available vaccines.
 outputs.
 
 ```js
-function runModel(parameters)
+function runModel(parameters, atol=1e-3, rtol=1e-3)
 ```
+
+The atol and rtol parameters are for absolute and relative tolerances for the
+ODE solver.
 
 `runModel` will return object with the following keys:
 
