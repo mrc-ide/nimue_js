@@ -1,7 +1,7 @@
 import { getModel } from '../build/nimue_odin.js';
 import { reffRaw } from './reff.js';
 
-export const runModel = function(parameters) {
+export const runModel = function(parameters, atol=1e-3, rtol=1e-3) {
 
   const model = getModel();
   const mod = new model(parameters._toOdin(), 'ignore');
@@ -11,7 +11,7 @@ export const runModel = function(parameters) {
     t.push(timeStart + i * dt);
   }
 
-  return mod.run(t);
+  return mod.run(t, null, null, atol, rtol);
 };
 
 export function reff(output, beta, population, parameters, mixingMatrix, tSubset = null) {
