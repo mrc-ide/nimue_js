@@ -1,4 +1,5 @@
 library(jsonlite)
+source('./R/strategies.R')
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 1) {
@@ -7,6 +8,7 @@ if (length(args) != 1) {
 out_dir <- args[1]
 
 # Set up test cases
+isos <- c('LCA', 'NGA', 'IND')
 countries <- c('St. Lucia', 'Nigeria', 'India')
 beds <- c(100, 100000, 100000000)
 beta <- 3
@@ -14,10 +16,12 @@ vaccines <- c(FALSE, TRUE)
 
 scenario <- 0
 
-for (country in countries) {
+for (i in seq_along(countries)) {
   for (bed in beds) {
     for (vaccinate in vaccines) {
-      cpm <- squire:::parse_country_population_mixing_matrix(country = country)
+      cpm <- squire:::parse_country_population_mixing_matrix(
+        country = countries[[i]]
+      )
       if (vaccinate) {
         output <- nimue::run(
           population = cpm$population,
@@ -25,7 +29,7 @@ for (country in countries) {
           beta_set = beta,
           max_vaccine = c(0, 10000),
           tt_vaccine = c(0, 100),
-          vaccine_coverage_mat = nimue::strategy_matrix('Elderly'),
+          vaccine_coverage_mat = strategy_etage_iso(.8, isos[[i]]),
           vaccine_efficacy_disease = rep(.99, 17),
           vaccine_efficacy_infection = rep(.92, 17),
           hosp_bed_capacity = bed,

@@ -1,6 +1,9 @@
 import strategies from '../data/strategies.json';
 import defaultParams from '../data/default_parameters.json';
 import { wellFormedArray } from './utils.js';
+import { round } from './math_bundle.js';
+
+const PRECISION = 15;
 
 export const createParameters = (
   S_0,
@@ -78,11 +81,11 @@ export const createParameters = (
         throw Error("infectionEfficacy needs to be >= 0 and <= 1");
       }
       const vaccinatedProbHosp = defaultParams.prob_hosp[0].map(
-        i => i * (1 - diseaseEfficacy)
+        i => round(i * (1 - diseaseEfficacy), PRECISION)
       );
       const vaccinatedInfectedEff = Array(
         defaultParams.vaccine_efficacy_infection[0].length
-      ).fill(1 - infectionEfficacy);
+      ).fill(round(1 - infectionEfficacy, PRECISION));
       this.probHosp[3] = vaccinatedProbHosp;
       this.probHosp[4] = vaccinatedProbHosp;
       this.infectionEfficacy[3] = vaccinatedInfectedEff;
@@ -94,6 +97,10 @@ export const createParameters = (
         throw Error(`Unknown strategy ${strategy}`);
       }
       this.nCoverageMat = strategies[strategy];
+      return this;
+    },
+    withPrioritisationMatrix: function(m) {
+      this.nCoverageMat = m;
       return this;
     },
     _toOdin: function() {

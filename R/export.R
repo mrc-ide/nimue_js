@@ -1,5 +1,6 @@
 library(nimue)
 library(jsonlite)
+source('./R/strategies.R')
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 1) {
@@ -71,12 +72,15 @@ for (iso3c in names(countries)) {
       ),
       S_0 = parameters$S_0,
       E1_0 = parameters$E1_0,
-      eigenvalue = eigenvalue
+      eigenvalue = eigenvalue,
+      whoPriority = strategy_who_iso(.8, iso3c),
+      etagePriority = strategy_etage_iso(.8, iso3c)
     ),
     file.path(out_dir, paste0(iso3c, '.json')),
     matrix='columnmajor',
     auto_unbox=TRUE,
-    digits=NA
+    digits=NA,
+    null='null'
   )
 
   if (!saved_default_parameters) {
