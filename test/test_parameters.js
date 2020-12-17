@@ -11,8 +11,7 @@ import stlucia from '../data/LCA.json'
 describe('createParameters', function() {
   it('can create default odin parameters', function() {
     const actual = createParameters(
-      stlucia.S_0,
-      stlucia.E1_0,
+      stlucia.population,
       stlucia.contactMatrix,
       0,
       3,
@@ -32,17 +31,40 @@ describe('createParameters', function() {
       tt_hosp_beds,
       tt_ICU_beds,
       S_0,
-      E1_0,
       ...unchanged
     } = actual._toOdin();
 
     expect(unchanged).to.be.deep.equal(default_params);
   });
 
+  it('can seed the population correctly', function() {
+    const actual = createParameters(
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      1000
+    );
+
+    const {
+      S_0,
+      ...others
+    } = actual._toOdin();
+
+    expect(S_0).to.be.deep.equal([
+      [1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17],
+      Array(17).fill(0),
+      Array(17).fill(0),
+      Array(17).fill(0),
+      Array(17).fill(0),
+      Array(17).fill(0)
+    ]);
+  });
+
   it('parameterises beds correctly', function() {
     const actual = createParameters(
-      stlucia.S_0,
-      stlucia.E1_0,
+      stlucia.population,
       stlucia.contactMatrix,
       0,
       3,
@@ -62,8 +84,7 @@ describe('createParameters', function() {
 
   it('parameterises strategies correctly', function() {
     const actual = createParameters(
-      stlucia.S_0,
-      stlucia.E1_0,
+      stlucia.population,
       stlucia.contactMatrix,
       0,
       3,
@@ -83,8 +104,7 @@ describe('createParameters', function() {
 
   it('accepts prioritisation matrices', function() {
     const actual = createParameters(
-      stlucia.S_0,
-      stlucia.E1_0,
+      stlucia.population,
       stlucia.contactMatrix,
       0,
       3,
@@ -104,8 +124,7 @@ describe('createParameters', function() {
 
   it('parameterises efficacy correctly', function() {
     const actual = createParameters(
-      stlucia.S_0,
-      stlucia.E1_0,
+      stlucia.population,
       stlucia.contactMatrix,
       0,
       3,
@@ -157,8 +176,7 @@ describe('createParameters', function() {
 
   it('Throws error on late start time', function() {
     let params = createParameters(
-      stlucia.S_0,
-      stlucia.E1_0,
+      stlucia.population,
       stlucia.contactMatrix,
       0,
       3,
@@ -172,8 +190,7 @@ describe('createParameters', function() {
   it('Throws error on mismatched beta arrays', function() {
     expect(() => {
       createParameters(
-        stlucia.S_0,
-        stlucia.E1_0,
+        stlucia.population,
         stlucia.contactMatrix,
         [0, 50, 200],
         [3, 3/2],
@@ -186,8 +203,7 @@ describe('createParameters', function() {
   it('Throws error on mismatched population and contact matrices', function() {
     expect(() => {
       createParameters(
-        stlucia.S_0.slice(2),
-        stlucia.E1_0,
+        stlucia.population.slice(2),
         stlucia.contactMatrix,
         [0, 50, 200],
         [3, 3/2, 3],
@@ -200,8 +216,7 @@ describe('createParameters', function() {
   it('Throws error on negative beds', function() {
     expect(() => {
       createParameters(
-        stlucia.S_0,
-        stlucia.E1_0,
+        stlucia.population,
         stlucia.contactMatrix,
         [0, 50, 200],
         [3, 3/2, 3],
@@ -213,8 +228,7 @@ describe('createParameters', function() {
 
   it('Throws error on mismatched max_vaccine', function() {
     const params = createParameters(
-      stlucia.S_0,
-      stlucia.E1_0,
+      stlucia.population,
       stlucia.contactMatrix,
       0,
       3,
@@ -230,8 +244,7 @@ describe('createParameters', function() {
   it('Throws error on mismatched contact matrix dimension', function() {
     expect(() => {
       createParameters(
-        [[1, 2]],
-        [[1, 2]],
+        [1, 2],
         [[1, 2], [1, 2], [1, 2]],
         [0, 50, 200],
         [3, 3/2, 3],

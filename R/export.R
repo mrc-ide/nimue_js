@@ -23,7 +23,8 @@ for (iso3c in names(countries)) {
 
   parameters <- nimue:::parameters(
     country = country,
-    seeding_cases = 20,
+    seeding_cases = 5,
+    seeding_age_order = seq(6, 10),
 
     # Durations
     dur_E = default_durations$dur_E,
@@ -70,8 +71,6 @@ for (iso3c in names(countries)) {
         parameters$contact_matrix_set[[1]],
         parameters$population
       ),
-      S_0 = parameters$S_0,
-      E1_0 = parameters$E1_0,
       eigenvalue = eigenvalue,
       whoPriority = strategy_who_iso(.8, iso3c),
       etagePriority = strategy_etage_iso(.8, iso3c)
@@ -98,8 +97,7 @@ for (iso3c in names(countries)) {
       'ICU_beds',
       'tt_hosp_beds',
       'tt_ICU_beds',
-      'S_0',
-      'E1_0'
+      'S_0'
     )] <- NULL
     default_parameters <- c(
       default_parameters,

@@ -43,8 +43,7 @@ createParameters takes the minimum info to create a parameter set for the model.
 
 ```js
 function createParameters(
-  S_0,
-  E1_0,
+  population,
   contactMatrix,
   ttBeta,
   betaSet,
@@ -55,10 +54,7 @@ function createParameters(
 
 The arguments are:
 
-  * S_0 - is an array of initial sizes for for the susceptible population in
-    each of the 17 age groups
-  * E1_0 - is an array of initial number of latent infections in
-    each of the 17 age groups
+  * population - is an array of population sizes for each of the 17 age groups
   * contactMatrix - is the 17 x 17 contact matrix between age groups
   * ttBeta - is an array of timesteps at which the beta value will change
   * betaSet - is an array of beta values that will change in line with `ttBeta`.
@@ -172,8 +168,7 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.S_0,
-    nigeriaData.E1_0,
+    nigeriaData.population,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -195,8 +190,7 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.S_0,
-    nigeriaData.E1_0,
+    nigeriaData.population,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -216,8 +210,7 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.S_0,
-    nigeriaData.E1_0,
+    nigeriaData.population,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -237,8 +230,7 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.S_0,
-    nigeriaData.E1_0,
+    nigeriaData.population,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
@@ -261,8 +253,7 @@ const ttBeta  = [0, 10,  20,  30,  40 ];
 const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
 const results = runModel(
   createParameters(
-    nigeriaData.S_0,
-    nigeriaData.E1_0,
+    nigeriaData.population,
     nigeriaData.contactMatrix,
     ttBeta,
     beta,
