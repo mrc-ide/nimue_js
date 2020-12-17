@@ -261,7 +261,7 @@ const results = runModel(
     10000000000
   )
   .withMaxVaccine([0, 20], [0, 100000])
-  .withStrategy(nigeriaData.etagePriority)
+  .withPrioritisationMatrix(nigeriaData.etagePriority)
 );
 ```
 
