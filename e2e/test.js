@@ -34,8 +34,7 @@ async function test() {
         browser.evaluate(
           `
           p = createParameters(
-            ${country}.S_0,
-            ${country}.E1_0,
+            ${country}.population,
             ${country}.contactMatrix,
             [0],
             [${beta}],

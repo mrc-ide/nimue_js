@@ -1,36 +1,27 @@
 import strategies from '../data/strategies.json';
 import defaultParams from '../data/default_parameters.json';
 import { wellFormedArray } from './utils.js';
-import { round } from './math_bundle.js';
+import { round, subtract } from './math_bundle.js';
 
 const PRECISION = 15;
+const nAge = 17;
+const nVaccine = 6;
 
 export const createParameters = (
-  S_0,
-  E1_0,
+  population,
   mixMatSet,
   ttBeta,
   betaSet,
   nBeds,
   nICUBeds
 ) => {
-  const nAge = 17;
-  const nVaccine = 6;
 
-  if (!wellFormedArray(S_0, [nVaccine, nAge])) {
-    throw Error(`S_0 must have the dimensions ${nVaccine} x ${nAge}`);
-  }
-
-  if (!wellFormedArray(E1_0, [nVaccine, nAge])) {
-    throw Error(`E1_0 must have the dimensions ${nVaccine} x ${nAge}`);
+  if (population.length !== nAge) {
+    throw Error(`population must be length ${nAge}`);
   }
 
   if (!wellFormedArray(mixMatSet, [nAge, nAge, 1])) {
     throw Error(`mixMatSet must have the dimensions ${nAge} x ${nAge} x 1`);
-  }
-
-  if (!(nAge == mixMatSet[0].length && nAge == E1_0[0].length)) {
-    throw Error("mismatch between population and mixing matrix size");
   }
 
   if (ttBeta.length !== betaSet.length) {
@@ -41,18 +32,21 @@ export const createParameters = (
     throw Error("Bed counts must be greater than or equal to 0");
   }
 
+  // Remove the seed exposed population
+  let S0 = Array(nVaccine).fill(Array(nAge).fill(0));
+  S0[0] = subtract(population, defaultParams.E1_0[0]);
+
   let parameters = {
     mixMatSet,
     ttBeta,
     betaSet,
     nBeds,
     nICUBeds,
-    S_0,
-    E1_0,
     timeStart: 0,
     timeEnd: 250,
     ttVaccines: [0],
     maxVaccines: [0],
+    S_0: S0,
     nCoverageMat: defaultParams.vaccine_coverage_mat,
     infectionEfficacy: defaultParams.vaccine_efficacy_infection,
     probHosp: defaultParams.prob_hosp,
@@ -119,7 +113,6 @@ export const createParameters = (
         prob_hosp: this.probHosp,
         vaccine_efficacy_infection: this.infectionEfficacy,
         S_0: this.S_0,
-        E1_0: this.E1_0,
         vaccine_coverage_mat: this.nCoverageMat,
         N_prioritisation_steps: this.nCoverageMat[0].length
       };

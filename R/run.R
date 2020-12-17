@@ -37,6 +37,8 @@ for (i in seq_along(countries)) {
           ICU_bed_capacity = bed,
           tt_ICU_beds = 0,
           dur_V = 5000,
+          seeding_cases = 5,
+          seeding_age_order = seq(6, 10),
           seed = 42
         )
       } else {
@@ -51,6 +53,8 @@ for (i in seq_along(countries)) {
           ICU_bed_capacity = bed,
           tt_ICU_beds = 0,
           dur_V = 5000,
+          seeding_cases = 5,
+          seeding_age_order = seq(6, 10),
           seed = 42
         )
       }
