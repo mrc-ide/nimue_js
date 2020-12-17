@@ -32,6 +32,7 @@ for (country in countries) {
           tt_hosp_beds = 0,
           ICU_bed_capacity = bed,
           tt_ICU_beds = 0,
+          dur_V = 5000,
           seed = 42
         )
       } else {
@@ -45,6 +46,7 @@ for (country in countries) {
           tt_hosp_beds = 0,
           ICU_bed_capacity = bed,
           tt_ICU_beds = 0,
+          dur_V = 5000,
           seed = 42
         )
       }
