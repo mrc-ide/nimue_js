@@ -81,6 +81,27 @@ describe('createParameters', function() {
     expect(N_prioritisation_steps).to.be.equal(1);
   });
 
+  it('accepts prioritisation matrices', function() {
+    const actual = createParameters(
+      stlucia.S_0,
+      stlucia.E1_0,
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      3000
+    ).withPrioritisationMatrix(stlucia.etagePriority);
+
+    const {
+      vaccine_coverage_mat,
+      N_prioritisation_steps,
+      ...others
+    } = actual._toOdin();
+
+    expect(vaccine_coverage_mat).to.be.deep.equal(stlucia.etagePriority);
+    expect(N_prioritisation_steps).to.be.equal(16);
+  });
+
   it('parameterises efficacy correctly', function() {
     const actual = createParameters(
       stlucia.S_0,

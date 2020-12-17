@@ -22,7 +22,8 @@ import {
   sizeDependencies,
   concatDependencies,
   zerosDependencies,
-  applyDependencies
+  applyDependencies,
+  roundDependencies
 } from 'mathjs';
 
 export const {
@@ -47,7 +48,8 @@ export const {
   size,
   concat,
   zeros,
-  apply
+  apply,
+  round
 } = create({
   addDependencies,
   dotDivideDependencies,
@@ -70,5 +72,6 @@ export const {
   sizeDependencies,
   concatDependencies,
   zerosDependencies,
-  applyDependencies
+  applyDependencies,
+  roundDependencies
 }, { randomSeed: 42 })

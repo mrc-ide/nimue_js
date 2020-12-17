@@ -37,7 +37,7 @@ You can access the model using ES6 import syntax:
 import { runModel, createParameters } from './nimue.js'
 ```
 
-### Parameterisation (to be implemented)
+### Parameterisation
 
 createParameters takes the minimum info to create a parameter set for the model.
 
@@ -247,6 +247,30 @@ const results = runModel(
   )
   .withMaxVaccine([0, 20], [0, 100000])
   .withStrategy('elderly') // the two options here are 'elderly' and 'all'
+);
+```
+
+### Prioritisation Matrices
+
+We can model more complex strategies using prioritisation matrices. We provide 2
+in the country JSON files: etagePriority and whoPriority
+
+```js
+import nigeriaData from './data/NGA.json';
+const ttBeta  = [0, 10,  20,  30,  40 ];
+const betaSet = [3, 3.2, 2.5, 1.9, 5.2];
+const results = runModel(
+  createParameters(
+    nigeriaData.S_0,
+    nigeriaData.E1_0,
+    nigeriaData.contactMatrix,
+    ttBeta,
+    beta,
+    10000000000,
+    10000000000
+  )
+  .withMaxVaccine([0, 20], [0, 100000])
+  .withStrategy(nigeriaData.etagePriority)
 );
 ```
 
