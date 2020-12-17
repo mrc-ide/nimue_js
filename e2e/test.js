@@ -82,6 +82,26 @@ async function test() {
       } else {
         console.log('passed');
       }
+      
+      /*
+       * Basic test of Reff
+      */
+      const reff = browser.evaluate(
+        `
+        reff(
+          r.output.y,
+          [${beta}],
+          ${country}.population,
+          p,
+          ${country}.contactMatrixScaledAge
+        )
+        `
+      )
+      if (!reff[0] == 4) {
+        failed = true;
+        console.log(`Expected ${reff[0]} == 4 for t = 0`)
+      }
+
       scenario++;
     }
   }

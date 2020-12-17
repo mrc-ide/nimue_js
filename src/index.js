@@ -1,4 +1,5 @@
 import { getModel } from '../build/nimue_odin.js';
+import { reffRaw } from './reff.js';
 
 export const runModel = function(parameters) {
 
@@ -11,6 +12,19 @@ export const runModel = function(parameters) {
   }
 
   return mod.run(t);
+};
+
+export function reff(output, beta, population, parameters, mixingMatrix, tSubset = null) {
+  const odinParameters = parameters._toOdin();
+  return reffRaw(
+    output,
+    beta, 
+    population, 
+    mixingMatrix,
+    odinParameters.prob_hosp, 
+    odinParameters.vaccine_efficacy_infection,
+    tSubset
+  )
 };
 
 export { createParameters } from './parameters.js';
