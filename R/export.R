@@ -72,8 +72,8 @@ for (iso3c in names(countries)) {
         parameters$population
       ),
       eigenvalue = eigenvalue,
-      whoPriority = strategy_who_iso(.8, iso3c),
-      etagePriority = strategy_etage_iso(.8, iso3c)
+      whoPriority = strategy_who_iso(1, iso3c),
+      etagePriority = strategy_etage_iso(1, iso3c)
     ),
     file.path(out_dir, paste0(iso3c, '.json')),
     matrix='columnmajor',
@@ -112,8 +112,8 @@ for (iso3c in names(countries)) {
     )
     write_json(
       list(
-        all = nimue::strategy_matrix('All'),
-        elderly = nimue::strategy_matrix('Elderly')
+        all = nimue::strategy_matrix('All', max_coverage = 1),
+        elderly = nimue::strategy_matrix('Elderly', max_coverage = 1)
       ),
       file.path(out_dir, 'strategies.json'),
       matrix='columnmajor',
