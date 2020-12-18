@@ -82,6 +82,33 @@ describe('createParameters', function() {
     expect(ICU_beds[0]).to.be.equal(3000);
   });
 
+  it('can set dur_V', function() {
+    const actual = createParameters(
+      stlucia.population,
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      3000
+    ).withVaccineDuration(365);
+
+    const {
+      gamma_vaccine,
+      ...others
+    } = actual._toOdin();
+
+    expect(gamma_vaccine).to.be.deep.equal(
+      [
+        0,
+        0.142857142857143,
+        0.142857142857143,
+        0.005479452054794521,
+        0.005479452054794521,
+        0
+      ]
+    )
+  });
+
   it('parameterises strategies correctly', function() {
     const actual = createParameters(
       stlucia.population,
@@ -90,7 +117,7 @@ describe('createParameters', function() {
       3,
       1000,
       3000
-    ).withStrategy('all');
+    ).withStrategy('all', .8);
 
     const {
       vaccine_coverage_mat,
@@ -103,6 +130,25 @@ describe('createParameters', function() {
   });
 
   it('accepts prioritisation matrices', function() {
+    const priority = [
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [0, 0.8],
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [1, 1]
+    ]
     const actual = createParameters(
       stlucia.population,
       stlucia.contactMatrix,
@@ -110,7 +156,30 @@ describe('createParameters', function() {
       3,
       1000,
       3000
-    ).withPrioritisationMatrix(stlucia.etagePriority);
+    ).withPrioritisationMatrix(
+      priority,
+      .5
+    );
+
+    const expected = [
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [0, 0.4],
+      [.5, .5],
+      [.5, .5],
+      [.5, .5],
+      [.5, .5],
+      [.5, .5]
+    ]
 
     const {
       vaccine_coverage_mat,
@@ -118,8 +187,8 @@ describe('createParameters', function() {
       ...others
     } = actual._toOdin();
 
-    expect(vaccine_coverage_mat).to.be.deep.equal(stlucia.etagePriority);
-    expect(N_prioritisation_steps).to.be.equal(16);
+    expect(vaccine_coverage_mat).to.be.deep.equal(expected);
+    expect(N_prioritisation_steps).to.be.equal(2);
   });
 
   it('parameterises efficacy correctly', function() {

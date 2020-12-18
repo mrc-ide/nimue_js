@@ -93,13 +93,25 @@ is a value between 0 and 1 that reduces the transmission parameter ($\beta$) by 
 
 
 ```js
-//not yet implemented
-Parameters.withVaccineTarget(vaccineTarget = Array(17).fill(1));
+Parameters.withStrategy(strategy, coverage);
 ```
 
-This models an age-specific targeting of the vaccine. `vaccineTarget` is an
-array representing the proportion of each age group who are eligible for any
-available vaccines.
+This models a predefined prioritisation strategy for vaccine distribution. This
+can be either "elderly" or "all". `coverage` parameterised the maximum population coverage for
+the strategy.
+
+```js
+Parameters.withPrioritisationMatrices(m, coverage);
+```
+
+This models a prioritisation strategy based on a matrix `m`. `coverage` parameterised the maximum population coverage for
+the strategy.
+
+```js
+Parameters.withVaccineDuration(timesteps);
+```
+
+Sets the duration of vaccine efficacy in the model
 
 ### Running the model
 
@@ -238,7 +250,7 @@ const results = runModel(
     10000000000
   )
   .withMaxVaccine([0, 20], [0, 100000])
-  .withStrategy('elderly') // the two options here are 'elderly' and 'all'
+  .withStrategy('elderly', .8) // the two options here are 'elderly' and 'all'
 );
 ```
 
@@ -261,7 +273,7 @@ const results = runModel(
     10000000000
   )
   .withMaxVaccine([0, 20], [0, 100000])
-  .withPrioritisationMatrix(nigeriaData.etagePriority)
+  .withPrioritisationMatrix(nigeriaData.etagePriority, .8)
 );
 ```
 

@@ -50,6 +50,7 @@ export const createParameters = (
     nCoverageMat: defaultParams.vaccine_coverage_mat,
     infectionEfficacy: defaultParams.vaccine_efficacy_infection,
     probHosp: defaultParams.prob_hosp,
+    gammaVaccine: defaultParams.gamma_vaccine,
     dt: 1,
     withHorizon: function(timeStart, timeEnd) {
       if (timeStart > timeEnd) {
@@ -86,15 +87,29 @@ export const createParameters = (
       this.infectionEfficacy[4] = vaccinatedInfectedEff;
       return this;
     },
-    withStrategy: function(strategy) {
+    withStrategy: function(strategy, coverage) {
       if (!strategies.hasOwnProperty(strategy)) {
         throw Error(`Unknown strategy ${strategy}`);
       }
-      this.nCoverageMat = strategies[strategy];
+      return this.withPrioritisationMatrix(strategies[strategy], coverage);
+    },
+    withPrioritisationMatrix: function(m, coverage) {
+      if (!(coverage >= 0 && coverage <= 1)) {
+        throw Error("Vaccine coverage must be >= 0 and <= 1");
+      }
+      if (coverage == null) {
+        throw Error("Please specify vaccine coverage");
+      }
+      this.nCoverageMat = m.map(row => { return row.map(i => i * coverage) });
       return this;
     },
-    withPrioritisationMatrix: function(m) {
-      this.nCoverageMat = m;
+    withVaccineDuration: function(timesteps) {
+      if (!timesteps > 0) {
+        throw Error("timesteps must be greater than 0");
+      }
+      const gammaV = 2 * 1 / timesteps;
+      this.gammaVaccine[3] = gammaV;
+      this.gammaVaccine[4] = gammaV;
       return this;
     },
     _toOdin: function() {
@@ -114,7 +129,8 @@ export const createParameters = (
         vaccine_efficacy_infection: this.infectionEfficacy,
         S_0: this.S_0,
         vaccine_coverage_mat: this.nCoverageMat,
-        N_prioritisation_steps: this.nCoverageMat[0].length
+        N_prioritisation_steps: this.nCoverageMat[0].length,
+        gamma_vaccine: this.gammaVaccine
       };
     }
   };

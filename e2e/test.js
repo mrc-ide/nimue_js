@@ -48,7 +48,7 @@ async function test() {
             `
             p = p
               .withMaxVaccine([0, 100], [0, 10000])
-              .withPrioritisationMatrix(${country}.etagePriority)
+              .withPrioritisationMatrix(${country}.etagePriority, .8)
               .withVaccineEfficacy(.99, .92)
             `
           )
