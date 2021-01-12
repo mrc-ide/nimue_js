@@ -1,7 +1,7 @@
 hcw <- readRDS("./data-raw/prop_working_age_healthcare.rda")
 
 cm <- readRDS("./data-raw/Clark_formatted.RDS")
-cm <- subset(cm, (cm$age_low > 10) & (cm$age_low < 60))
+cm <- subset(cm, (cm$age_low > 10) & (cm$age_low < 65))
 cm <- cm[c('iso3c', 'at_least_one_condition')]
 
 strategy_who_iso <- function(max_coverage, iso3c){
@@ -68,20 +68,20 @@ strategy_etage <- function(max_coverage, risk_proportion_hcw, risk_proportion_cm
     risk_proportion_cm <- unlist(risk_proportion_cm)
   }
 
-  if(!length(risk_proportion_cm) %in% c(1, 9)){
-    stop("Length of risk_proportion_cm must = 1 or 9")
+  if(!length(risk_proportion_cm) %in% c(1, 10)){
+    stop("Length of risk_proportion_cm must = 1 or 10")
   }
   # Index for ages 15-64
   hcw_age_index <- 4:13
-  # Index for ages 15-60
-  comorbidity_age_index <- 4:12
+  # Index for ages 15-64
+  comorbidity_age_index <- 4:13
   
   # Row for helathcare workers
   hcw_age_risk <- matrix(0, ncol = 17, nrow = 1)
   hcw_age_risk[, hcw_age_index] <- max_coverage * risk_proportion_hcw
   
-  # Rows for 80+ - 60
-  elderly <- nimue::strategy_matrix("Elderly", max_coverage = max_coverage)[1:5,]
+  # Rows for 80+ - 65
+  elderly <- nimue::strategy_matrix("Elderly", max_coverage = max_coverage)[1:4,]
   elderly <- pmax(elderly, hcw_age_risk[rep(1, nrow(elderly)),])
   
   # Rows for comorbidities
@@ -90,7 +90,7 @@ strategy_etage <- function(max_coverage, risk_proportion_hcw, risk_proportion_cm
   comorbidities_age_risk <- pmax(comorbidities_age_risk, elderly[nrow(elderly), ])
   
   # Everyone else
-  remaining_pop <- nimue::strategy_matrix("Elderly", max_coverage = max_coverage)[-c(1:5, 15:17),]
+  remaining_pop <- nimue::strategy_matrix("Elderly", max_coverage = max_coverage)[-c(1:4, 15:17),]
   remaining_pop <- pmax(remaining_pop, comorbidities_age_risk[rep(1, nrow(remaining_pop)), ])
   
   etage_matrix <- rbind(hcw_age_risk, elderly, comorbidities_age_risk, remaining_pop)
