@@ -23,6 +23,11 @@ strategy_etage_iso <- function(max_coverage, iso3c){
   }
 }
 
+exclude_children <- function(p_matrix) {
+  p_matrix[,1:3] <- 0
+  p_matrix
+}
+
 #' Strategy for WHO Europe work
 #'
 #' @param max_coverage Maximum coverage achievable for any single age-group
