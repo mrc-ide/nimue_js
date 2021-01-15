@@ -125,7 +125,10 @@ describe('createParameters', function() {
       ...others
     } = actual._toOdin();
 
-    expect(vaccine_coverage_mat).to.be.deep.equal(Array(17).fill([.8]));
+    expect(vaccine_coverage_mat).to.be.deep.equal([
+      ...Array(3).fill([0]),
+      ...Array(14).fill([.8])
+    ]);
     expect(N_prioritisation_steps).to.be.equal(1);
   });
 

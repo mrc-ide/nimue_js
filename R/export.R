@@ -112,8 +112,8 @@ for (iso3c in names(countries)) {
     )
     write_json(
       list(
-        all = nimue::strategy_matrix('All', max_coverage = 1),
-        elderly = nimue::strategy_matrix('Elderly', max_coverage = 1)
+        all = exclude_children(nimue::strategy_matrix('All', max_coverage = 1)),
+        elderly = exclude_children(nimue::strategy_matrix('Elderly', max_coverage = 1))
       ),
       file.path(out_dir, 'strategies.json'),
       matrix='columnmajor',
