@@ -42,7 +42,7 @@ for (iso3c in names(countries)) {
     dur_not_get_mv_die = default_durations$dur_not_get_mv_die,
 
     dur_rec = default_durations$dur_rec,
-    dur_R = vaccine_params$dur_R,
+    dur_R = 365,
 
     # Vaccine
     dur_V = 5000,
