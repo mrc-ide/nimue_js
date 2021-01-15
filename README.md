@@ -93,19 +93,26 @@ is a value between 0 and 1 that reduces the transmission parameter ($\beta$) by 
 
 
 ```js
-Parameters.withStrategy(strategy, coverage);
+Parameters.withStrategy(strategy, coverage, vaccinesAvailable);
 ```
 
-This models a predefined prioritisation strategy for vaccine distribution. This
-can be either "elderly" or "all". `coverage` parameterised the maximum population coverage for
-the strategy.
+This models a predefined prioritisation strategy for vaccine distribution.
+
+`strategy` can be either "elderly" or "all".
+
+`coverage` sets the maximum coverage for the targeted age group.
+
+`vaccinesAvailable` sets the total number of vaccines available.
 
 ```js
-Parameters.withPrioritisationMatrices(m, coverage);
+Parameters.withPrioritisationMatrices(m, coverage, vaccinesAvailable);
 ```
 
-This models a prioritisation strategy based on a matrix `m`. `coverage` parameterised the maximum population coverage for
-the strategy.
+This models a prioritisation strategy based on a matrix `m`.
+
+`coverage` sets the maximum coverage for the targeted age group.
+
+`vaccinesAvailable` sets the total number of vaccines available.
 
 ```js
 Parameters.withVaccineDuration(timesteps);
@@ -250,7 +257,7 @@ const results = runModel(
     10000000000
   )
   .withMaxVaccine([0, 20], [0, 100000])
-  .withStrategy('elderly', .8) // the two options here are 'elderly' and 'all'
+  .withStrategy('elderly', .8, 1e8) // the two options here are 'elderly' and 'all'
 );
 ```
 
@@ -273,7 +280,7 @@ const results = runModel(
     10000000000
   )
   .withMaxVaccine([0, 20], [0, 100000])
-  .withPrioritisationMatrix(nigeriaData.etagePriority, .8)
+  .withPrioritisationMatrix(nigeriaData.etagePriority, .8, 1e5)
 );
 ```
 

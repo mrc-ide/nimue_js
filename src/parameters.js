@@ -2,6 +2,7 @@ import strategies from '../data/strategies.json';
 import defaultParams from '../data/default_parameters.json';
 import { wellFormedArray } from './utils.js';
 import { round, subtract } from './math_bundle.js';
+import { scalePrioritisation } from './strategy.js';
 
 const PRECISION = 15;
 const nAge = 17;
@@ -42,6 +43,7 @@ export const createParameters = (
     betaSet,
     nBeds,
     nICUBeds,
+    population,
     timeStart: 0,
     timeEnd: 250,
     ttVaccines: [0],
@@ -87,20 +89,28 @@ export const createParameters = (
       this.infectionEfficacy[4] = vaccinatedInfectedEff;
       return this;
     },
-    withStrategy: function(strategy, coverage) {
+    withStrategy: function(strategy, coverage, vaccinesAvailable) {
       if (!strategies.hasOwnProperty(strategy)) {
         throw Error(`Unknown strategy ${strategy}`);
       }
-      return this.withPrioritisationMatrix(strategies[strategy], coverage);
+      return this.withPrioritisationMatrix(
+        strategies[strategy],
+        coverage,
+        vaccinesAvailable
+      );
     },
-    withPrioritisationMatrix: function(m, coverage) {
+    withPrioritisationMatrix: function(m, coverage, vaccinesAvailable) {
       if (!(coverage >= 0 && coverage <= 1)) {
         throw Error("Vaccine coverage must be >= 0 and <= 1");
       }
       if (coverage == null) {
         throw Error("Please specify vaccine coverage");
       }
-      this.nCoverageMat = m.map(row => { return row.map(i => i * coverage) });
+      this.nCoverageMat = scalePrioritisation(
+        m.map(row => { return row.map(i => i * coverage) }),
+        this.population,
+        vaccinesAvailable
+      )
       return this;
     },
     withVaccineDuration: function(timesteps) {
