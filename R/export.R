@@ -42,7 +42,7 @@ for (iso3c in names(countries)) {
     dur_not_get_mv_die = default_durations$dur_not_get_mv_die,
 
     dur_rec = default_durations$dur_rec,
-    dur_R = vaccine_params$dur_R,
+    dur_R = 365,
 
     # Vaccine
     dur_V = 5000,
@@ -50,7 +50,7 @@ for (iso3c in names(countries)) {
     vaccine_efficacy_disease = vaccine_params$vaccine_efficacy_disease,
     max_vaccine = 0,
     tt_vaccine = 0,
-    dur_vaccine_delay = vaccine_params$dur_vaccine_delay,
+    dur_vaccine_delay = 7,
     vaccine_coverage_mat = vaccine_params$vaccine_coverage_mat,
 
     # Health system capacity
