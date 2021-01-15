@@ -50,7 +50,7 @@ for (iso3c in names(countries)) {
     vaccine_efficacy_disease = vaccine_params$vaccine_efficacy_disease,
     max_vaccine = 0,
     tt_vaccine = 0,
-    dur_vaccine_delay = vaccine_params$dur_vaccine_delay,
+    dur_vaccine_delay = 7,
     vaccine_coverage_mat = vaccine_params$vaccine_coverage_mat,
 
     # Health system capacity
