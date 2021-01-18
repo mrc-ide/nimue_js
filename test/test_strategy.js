@@ -38,6 +38,25 @@ describe('scaleToAvailable', function() {
     }
   });
 
+  it('the penultimate steps of the matrix are unchanged', function() {
+    const wholePopulation = stlucia.population.reduce(sum, 0);
+    const strategy = stlucia.whoPriority;
+
+    for (let vaccineAvailable of [1e2, 1e3, 1e4, wholePopulation]) {
+      const matrix = scalePrioritisation(
+        strategy,
+        stlucia.population,
+        vaccineAvailable
+      );
+
+      for (let step = 0; step < matrix[0].length - 1; step++) {
+        const matrixStep = matrix.map(age => age[step]);
+        const strategyStep = strategy.map(age => age[step]);
+        expect(matrixStep).to.be.deep.equal(strategyStep);
+      }
+    }
+  });
+
   it('produces steps with increasing coverage', function() {
     const wholePopulation = stlucia.population.reduce(sum, 0);
     for (const vaccineAvailable of [1e2, 1e3, 1e4, wholePopulation]) {
