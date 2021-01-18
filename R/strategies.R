@@ -1,4 +1,4 @@
-hcw <- readRDS("./data-raw/prop_working_age_healthcare.rda")
+hcw <- readRDS("./data-raw/prop_working_age_healthcare.rds")
 
 cm <- readRDS("./data-raw/Clark_formatted.RDS")
 cm <- subset(cm, (cm$age_low > 10) & (cm$age_low < 65))
