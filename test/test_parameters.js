@@ -117,7 +117,7 @@ describe('createParameters', function() {
       3,
       1000,
       3000
-    ).withStrategy('all', .8);
+    ).withStrategy('all', .8, 1e8);
 
     const {
       vaccine_coverage_mat,
@@ -161,7 +161,8 @@ describe('createParameters', function() {
       3000
     ).withPrioritisationMatrix(
       priority,
-      .5
+      .5,
+      1e8
     );
 
     const expected = [
