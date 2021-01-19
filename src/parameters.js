@@ -53,6 +53,7 @@ export const createParameters = (
     infectionEfficacy: defaultParams.vaccine_efficacy_infection,
     probHosp: defaultParams.prob_hosp,
     gammaVaccine: defaultParams.gamma_vaccine,
+    gammaR: defaultParams.gamma_R,
     dt: 1,
     withHorizon: function(timeStart, timeEnd) {
       if (timeStart > timeEnd) {
@@ -122,6 +123,13 @@ export const createParameters = (
       this.gammaVaccine[4] = gammaV;
       return this;
     },
+    withNaturalImmunity: function(timesteps) {
+      if (!timesteps > 0) {
+        throw Error("timesteps must be greater than 0");
+      }
+      this.gammaR <- 2 * 1/timesteps;
+      return this;
+    },
     _toOdin: function() {
       return {
         ...defaultParams,
@@ -140,7 +148,8 @@ export const createParameters = (
         S_0: this.S_0,
         vaccine_coverage_mat: this.nCoverageMat,
         N_prioritisation_steps: this.nCoverageMat[0].length,
-        gamma_vaccine: this.gammaVaccine
+        gamma_vaccine: this.gammaVaccine,
+        gamma_R: this.gammaR
       };
     }
   };
