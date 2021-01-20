@@ -1,7 +1,7 @@
 import { getModel } from '../build/nimue_odin.js';
 import { reffRaw } from './reff.js';
 
-export const runModel = function(parameters, atol=1e-4, rtol=1e-4) {
+export const runModel = function(parameters, atol=1e-6, rtol=1e-6) {
 
   const model = getModel();
   const mod = new model(parameters._toOdin(), 'ignore');

@@ -27,7 +27,6 @@ describe('runModel', function() {
         general,
         icu
       ).withHorizon(0, 1024));
-      console.log(out)
     }
   });
 });
