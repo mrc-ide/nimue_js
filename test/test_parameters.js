@@ -82,6 +82,24 @@ describe('createParameters', function() {
     expect(ICU_beds[0]).to.be.equal(3000);
   });
 
+    it('parameterises dur_R correctly', function() {
+    const actual = createParameters(
+      stlucia.population,
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      3000
+    ).withNaturalImmunity(10);
+
+    const {
+      gamma_R,
+      ...others
+    } = actual._toOdin();
+
+    expect(gamma_R).to.be.equal(0.2);
+  });
+
   it('can set dur_V', function() {
     const actual = createParameters(
       stlucia.population,

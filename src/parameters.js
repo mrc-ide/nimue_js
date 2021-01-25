@@ -127,7 +127,7 @@ export const createParameters = (
       if (!timesteps > 0) {
         throw Error("timesteps must be greater than 0");
       }
-      this.gammaR <- 2 * 1/timesteps;
+      this.gammaR = 2 * 1/timesteps;
       return this;
     },
     _toOdin: function() {
