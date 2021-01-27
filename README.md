@@ -126,11 +126,16 @@ Sets the duration of vaccine efficacy in the model
 outputs.
 
 ```js
-function runModel(parameters, atol=1e-3, rtol=1e-3)
+function runModel(parameters, control)
 ```
 
-The atol and rtol parameters are for absolute and relative tolerances for the
-ODE solver.
+The `control` paramer is a dict that may take elements:
+
+* `atol`: absolute tolerance (e.g., 1e-5)
+* `rtol`: relative tolerance (e.g., 1e-5; generally set this to the same as `atol`)
+* `stepSizeMin`: smallest allowable step size
+* `stepSizeMinAllow`: boolean, if `true` then we continue after hitting `stepSizeMin` and do not reduce the step size further
+* `stepSizeMax`: maximum allowble step size; if we hit this we take steps of no larger than this size but always continue
 
 `runModel` will return object with the following keys:
 
