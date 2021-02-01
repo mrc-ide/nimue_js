@@ -3,7 +3,7 @@ import { reffRaw } from './reff.js';
 
 export const runModel = function(parameters, control = null) {
   if (control === null) {
-    control = {atol: 1e-3, rtol: 1e-3, stepSizeMin: 1e-5, stepSizeMax: 0.5, stepSizeMinAllow: true};
+    control = {atol: 1e-6, rtol: 1e-6, stepSizeMin: 1e-8, stepSizeMax: 0.5, stepSizeMinAllow: true};
   }
 
   const model = getModel();
