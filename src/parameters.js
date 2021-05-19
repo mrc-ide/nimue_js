@@ -1,7 +1,7 @@
 import strategies from '../data/strategies.json';
 import defaultParams from '../data/default_parameters.json';
 import { wellFormedArray } from './utils.js';
-import { round, subtract } from './math_bundle.js';
+import { concat, round, subtract } from './math_bundle.js';
 import { scalePrioritisation } from './strategy.js';
 
 const PRECISION = 15;
@@ -73,42 +73,49 @@ export const createParameters = (
       this.maxVaccines = maxVaccines;
       return this;
     },
-    withVaccineEfficacy: function(diseaseEfficacy, infectionEfficacy) {
-      if (!(diseaseEfficacy >= 0 && diseaseEfficacy <= 1)) {
-        throw Error("diseaseEfficacy needs to be >= 0 and <= 1");
+    withVaccineInfectionEfficacy: function(timesteps, infectionEfficacy) {
+      this.ttInfectionEfficacy = timesteps;
+      if (timesteps.length != infectionEfficacy.length) {
+        throw Error("timesteps and ve need to be the same size");
       }
-      if (!(infectionEfficacy >= 0 && infectionEfficacy <= 1)) {
-        throw Error("infectionEfficacy needs to be >= 0 and <= 1");
+      const nonVaccinated = Array(timesteps.length).fill(1);
+      for (let v of infectionEfficacy) {
+        if (!(v >= 0 && v <= 1)) {
+          throw Error("All vaccine efficacies must be >= 0 and <= 1");
+        }
       }
-      const vaccinatedProbHosp = defaultParams.prob_hosp[0].map(
-        i => round(i * (1 - diseaseEfficacy), PRECISION)
-      );
-      const vaccinatedInfectedEff = Array(
-        defaultParams.vaccine_efficacy_infection[0].length
-      ).fill(round(1 - infectionEfficacy, PRECISION));
-      this.probHosp[3] = vaccinatedProbHosp;
-      this.probHosp[4] = vaccinatedProbHosp;
-      this.infectionEfficacy[3] = vaccinatedInfectedEff;
-      this.infectionEfficacy[4] = vaccinatedInfectedEff;
+      const vaccinated = infectionEfficacy.map(i => 1 - i);
+      this.infectionEfficacy = [
+        Array(17).fill(nonVaccinated),
+        Array(17).fill(nonVaccinated),
+        Array(17).fill(nonVaccinated),
+        Array(17).fill(vaccinated),
+        Array(17).fill(vaccinated),
+        Array(17).fill(nonVaccinated)
+      ];
       return this;
     },
-    withVaccineEfficacy: function(diseaseEfficacy, infectionEfficacy) {
-      if (!(diseaseEfficacy >= 0 && diseaseEfficacy <= 1)) {
-        throw Error("diseaseEfficacy needs to be >= 0 and <= 1");
+    withVaccineDiseaseEfficacy: function(timesteps, diseaseEfficacy) {
+      if (timesteps.length != diseaseEfficacy.length) {
+        throw Error("timesteps and diseaseEfficacy need to be the same size");
       }
-      if (!(infectionEfficacy >= 0 && infectionEfficacy <= 1)) {
-        throw Error("infectionEfficacy needs to be >= 0 and <= 1");
+      this.ttProbHosp = timesteps;
+      for (let v of diseaseEfficacy) {
+        if (!(v >= 0 && v <= 1)) {
+          throw Error("All vaccine efficacies must be >= 0 and <= 1");
+        }
       }
-      const vaccinatedProbHosp = defaultParams.prob_hosp[0].map(
-        i => round(i * (1 - diseaseEfficacy), PRECISION)
-      );
-      const vaccinatedInfectedEff = Array(
-        defaultParams.vaccine_efficacy_infection[0].length
-      ).fill(round(1 - infectionEfficacy, PRECISION));
-      this.probHosp[3] = vaccinatedProbHosp;
-      this.probHosp[4] = vaccinatedProbHosp;
-      this.infectionEfficacy[3] = vaccinatedInfectedEff;
-      this.infectionEfficacy[4] = vaccinatedInfectedEff;
+      this.probHosp = concat(
+        ...diseaseEfficacy.map(efficacy => {
+          let probs = [...defaultParams.prob_hosp];
+          let nonVaccine = probs[0].map(
+            i => [round(i * (1 - efficacy), PRECISION)]
+          );
+          probs[3] = nonVaccine;
+          probs[4] = nonVaccine;
+          return probs;
+        })
+      )
       return this;
     },
     withStrategy: function(strategy, coverage, vaccinesAvailable) {
@@ -151,58 +158,7 @@ export const createParameters = (
       this.gammaR = 2 * 1/timesteps;
       return this;
     },
-    withTimeVaccineInfectionEfficacy: function(timesteps, ve) {
-      if (timesteps.length != ve.length) {
-        throw Error("timesteps and ve need to be the same size");
-      }
-      this.ttInfectionEfficacy = timesteps;
-
-      // We need to here know create an array of [nAge, nVaccine, timesteps.length]]
-      // and assign that to this.infectionEfficacy
-
-      // Then loop over each timestep we apply a function similar to below 
-      // where we fill in using the ve at timestep j (ve_j) - I don't know how js arrays work :)
-
-      /*
-      if (!(ve_j >= 0 && ve_j <= 1)) {
-        throw Error("infectionEfficacy needs to be >= 0 and <= 1");
-      }
-      const vaccinatedInfectedEff = Array(
-        defaultParams.vaccine_efficacy_infection[0].length
-      ).fill(round(1 - ve_j, PRECISION));
-      this.infectionEfficacy[j][3] = vaccinatedInfectedEff;
-      this.infectionEfficacy[j][4] = vaccinatedInfectedEff;
-      */
-
-      return this;
-    },
-    withTimeVaccineDiseaseEfficacy: function(timesteps, ve) {
-      if (timesteps.length != ve.length) {
-        throw Error("timesteps and ve need to be the same size");
-      }
-      this.ttProbHosp = timesteps;
-
-      // We need to here know create an array of [nAge, nVaccine, timesteps.length]]
-      // and assign that to this.infectionEfficacy
-
-      // Then loop over each timestep we apply a function similar to below 
-      // where we fill in using the ve at tiestep j (ve_j) - I don't know how js arrays work :)
-
-      /*
-      if (!(ve_j >= 0 && ve_j <= 1)) {
-        throw Error("infectionEfficacy needs to be >= 0 and <= 1");
-      }
-
-      const vaccinatedProbHosp = defaultParams.prob_hosp[0].map(
-        i => round(i * (1 - ve_j), PRECISION)
-      );
-
-      this.probHosp[j][3] = vaccinatedProbHosp;
-      this.probHosp[j][4] = vaccinatedProbHosp;
-      */
-
-      return this;
-    },
+    
     _toOdin: function() {
       return {
         ...defaultParams,
