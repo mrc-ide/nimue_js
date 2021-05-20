@@ -19,6 +19,12 @@ describe('createParameters', function() {
       1000
     );
 
+    const expected = {
+      ...default_params,
+      tt_vaccine_efficacy_infection: [0],
+      tt_vaccine_efficacy_disease: [0]
+    };
+
     const {
       population,
       mix_mat_set,
@@ -34,7 +40,7 @@ describe('createParameters', function() {
       ...unchanged
     } = actual._toOdin();
 
-    expect(unchanged).to.be.deep.equal(default_params);
+    expect(unchanged).to.be.deep.equal(expected);
   });
 
   it('can seed the population correctly', function() {
