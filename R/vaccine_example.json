@@ -1,0 +1,18 @@
+﻿[
+  {
+    "vaccine": {
+      "efficacyHosp": 0.9,
+      "efficacyInfection": 0.7
+    },
+    "introductionDate": "2021-05-14",
+    "quantity": 100000
+  },
+  {
+    "vaccine": {
+      "efficacyHosp": 0.95,
+      "efficacyInfection": 0.8
+    },
+    "introductionDate": "2021-05-16",
+    "quantity": 200000
+  }
+]

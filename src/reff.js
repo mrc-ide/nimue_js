@@ -39,19 +39,21 @@ export function reffRaw(
   population,
   mixingMatrix,
   probHosp,
+  ttEfficacyDisease,
   vaccineInfectionEfficacy,
+  ttEfficacyInfection,
   tSubset = null
 ) {
   if (!arrayEqual(size(mixingMatrix), [population.length, population.length])) {
     throw Error("mixMatSet must have the dimensions nAge x nAge");
   }
 
-  if (!arrayEqual(size(probHosp), [N_VACCINE_STATES, population.length])) {
-    throw Error("probHosp must have the dimensions nVaccine x nAge");
+  if (!arrayEqual(size(probHosp), [N_VACCINE_STATES, population.length, ttEfficacyDisease.length])) {
+    throw Error("probHosp must have the dimensions nVaccine x nAge x timesteps");
   }
 
-  if (!arrayEqual(size(vaccineInfectionEfficacy), [N_VACCINE_STATES, population.length])) {
-    throw Error("vaccineInfectionEfficacy must have the dimensions nVaccine x nAge");
+  if (!arrayEqual(size(vaccineInfectionEfficacy), [N_VACCINE_STATES, population.length, ttEfficacyInfection.length])) {
+    throw Error("vaccineInfectionEfficacy must have the dimensions nVaccine x nAge x timesteps");
   }
 
   if (population.length !== mixingMatrix.length) {
@@ -63,6 +65,32 @@ export function reffRaw(
   } else {
     beta = subset(beta, index(tSubset));
   }
+
+  // fill gaps and reshape probhosp to timestep x vaccine x age
+  probHosp = tSubset.map(t => {
+    let tIndex = ttEfficacyDisease.findIndex(n => n > t);
+    tIndex = tIndex === -1 ? ttEfficacyDisease.length - 1 : tIndex - 1;
+    return reshape(
+      subset(
+        probHosp,
+        index(range(0, N_VACCINE_STATES), range(0, population.length), tIndex)
+      ),
+      [N_VACCINE_STATES, population.length]
+    );
+  });
+
+  // fill gaps and reshape vaccine efficacy to timestep x vaccine x age
+  vaccineInfectionEfficacy = tSubset.map(t => {
+    let tIndex = ttEfficacyInfection.findIndex(n => n > t);
+    tIndex = tIndex === -1 ? ttEfficacyInfection.length - 1 : tIndex - 1;
+    return reshape(
+      subset(
+        vaccineInfectionEfficacy,
+        index(range(0, N_VACCINE_STATES), range(0, population.length), tIndex)
+      ),
+      [N_VACCINE_STATES, population.length]
+    );
+  });
 
   //remove singleton arrays
   output = squeeze(output);
@@ -78,21 +106,28 @@ export function reffRaw(
     ),
     // reshape to match probHosp shape
     [size(tSubset)[0], N_VACCINE_STATES, population.length]
-  )
-
-  // multiply by vaccine efficacy
-  propSusc = rowMultiply(propSusc, vaccineInfectionEfficacy);
-
-  const relativeR0 = add(
-    dotMultiply(probHosp, pars.dur_ICase),
-    dotMultiply(subtract(1, probHosp), pars.dur_IMild)
   );
 
-  const adjustedEigens = propSusc.map((_, i) => {
+  // multiply by vaccine efficacy along time
+  propSusc = propSusc.map((m, t) => {
+    return dotMultiply(
+      m, 
+      vaccineInfectionEfficacy[t]
+    )
+  });
+
+  const relativeR0 = probHosp.map(p => {
+    return add(
+      dotMultiply(p, pars.dur_ICase),
+      dotMultiply(subtract(1, p), pars.dur_IMild)
+    );
+  });
+
+  const adjustedEigens = propSusc.map((m, i) => {
     return leadingEigenvalue(
       rowMultiply(
         mixingMatrix,
-        apply(dotMultiply(propSusc[i], relativeR0), 0, sum)
+        apply(dotMultiply(m, relativeR0[i]), 0, sum)
       )
     );
   });

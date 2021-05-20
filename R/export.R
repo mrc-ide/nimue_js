@@ -47,7 +47,9 @@ for (iso3c in names(countries)) {
     # Vaccine
     dur_V = 5000,
     vaccine_efficacy_infection = vaccine_params$vaccine_efficacy_infection,
+    tt_vaccine_efficacy_infection = vaccine_params$tt_vaccine_efficacy_infection,
     vaccine_efficacy_disease = vaccine_params$vaccine_efficacy_disease,
+    tt_vaccine_efficacy_disease = vaccine_params$tt_vaccine_efficacy_disease,
     max_vaccine = 0,
     tt_vaccine = 0,
     dur_vaccine_delay = 7,
