@@ -226,7 +226,7 @@ const results = runModel(
 
 ### Vaccine profile
 
-We can simulate a vaccine which only mitigates onward infection.
+We can now simulate changing vaccine efficacy over time in resposne to changing doses/vaccine properties by passing in an array of timesteps and efficacies.
 
 ```js
 import nigeriaData from './data/NGA.json';
@@ -240,7 +240,9 @@ const results = runModel(
     beta,
     10000000000,
     10000000000
-  ).withVaccineEfficacy(0, .7)
+  )
+  .withVaccineDiseaseEfficacy([0, 1, 2], [.8, .9, .95])
+  .withVaccineInfectionEfficacy([0, 1, 2], [.5, .6, .7])
 );
 ```
 
