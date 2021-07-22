@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import { matrix, size, subset, index } from '../src/math_bundle.js'
 
 export function approxEqualArray(x, y, tolerance) {
   if (y.length !== x.length) {
@@ -27,16 +28,16 @@ export function approxEqualArray(x, y, tolerance) {
   return xy < tolerance;
 }
 
-export function expectMatrixEqual(x, y, tolerance=1e-4) {
-  expect(x.length).to.be.equal(y.length);
-  expect(x[0].length).to.be.equal(y[0].length);
-  for (let i = 0; i < x.length; i++) {
-    for (let j = 0; j < x[0].length; j++) {
-      expect(x[i][j]).to.be.closeTo(
-        y[i][j],
-        tolerance,
-        `matrix index ${i}, ${j} is off by ${i - j}`
-      )
-    }
-  }
+export function expectMultiArrayEqual(x_raw, y_raw, tolerance=1e-4) {
+  const x = matrix(x_raw);
+  const y = matrix(y_raw);
+  expect(size(x)).to.deep.equal(size(y));
+  x.forEach((u, i) => {
+    let v = subset(y, index(...i));
+    expect(u).to.be.closeTo(
+      v,
+      tolerance,
+      `matrix index ${i} is off by ${u - v}`
+    )
+  })
 }

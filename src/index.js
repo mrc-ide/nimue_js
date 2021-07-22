@@ -25,7 +25,9 @@ export function reff(output, beta, population, parameters, mixingMatrix, tSubset
     population, 
     mixingMatrix,
     odinParameters.prob_hosp, 
+    odinParameters.tt_vaccine_efficacy_disease,
     odinParameters.vaccine_efficacy_infection,
+    odinParameters.tt_vaccine_efficacy_disease,
     tSubset
   )
 };

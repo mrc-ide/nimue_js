@@ -1,5 +1,4 @@
 library(jsonlite)
-source('./R/reff.R')
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 1) {
@@ -7,7 +6,6 @@ if (length(args) != 1) {
 }
 
 out_dir <- args[1]
-
 country <- 'Brazil'
 input_data <- './test/assets/BRA_inputs.json'
 
@@ -28,32 +26,14 @@ output <- nimue::run(
   time_period = 365,
   max_vaccine = 1000000,
   tt_vaccine = 0,
+  vaccine_efficacy_infection = list(rep(0.2,17), rep(0.8, 17)),
+  tt_vaccine_efficacy_infection = c(0, 180),
   seed = 42
 )
 
 write_json(
   output$output,
-  file.path(out_dir, paste0('output_reff_nimue.json')),
-  pretty = TRUE,
-  digits=NA
-)
-
-write_json(
-  output$odin_parameters[c(
-    'prob_hosp',
-    'vaccine_efficacy_infection',
-    'tt_vaccine_efficacy_disease',
-    'tt_vaccine_efficacy_infection'
-  )],
-  file.path(out_dir, paste0('pars_reff.json')),
-  pretty = TRUE,
-  matrix = 'columnmajor',
-  digits=NA
-)
-
-write_json(
-  get_immunity_ratios(output, beta, length(beta)),
-  file.path(out_dir, paste0('output_reff.json')),
+  file.path(out_dir, paste0('output_vei_nimue.json')),
   pretty = TRUE,
   digits=NA
 )

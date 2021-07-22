@@ -17,7 +17,9 @@ describe('reff', function() {
       brazil.population,
       brazil.contactMatrixScaledAge,
       reffPars.prob_hosp,
-      reffPars.vaccine_efficacy_infection
+      reffPars.tt_vaccine_efficacy_disease,
+      reffPars.vaccine_efficacy_infection,
+      reffPars.tt_vaccine_efficacy_infection
     );
     assert(approxEqualArray(actual, reffOutput, 1e-4));
   });
@@ -32,7 +34,9 @@ describe('reff', function() {
       brazil.population,
       brazil.contactMatrixScaledAge,
       reffPars.prob_hosp,
+      reffPars.tt_vaccine_efficacy_disease,
       reffPars.vaccine_efficacy_infection,
+      reffPars.tt_vaccine_efficacy_infection,
       t
     );
     assert(approxEqualArray(actual, expected, 1e-4));

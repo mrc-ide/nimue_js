@@ -4,7 +4,7 @@ import sinon from 'sinon'
 import default_params from '../data/default_parameters.json'
 
 import { createParameters } from '../src/parameters.js'
-import { expectMatrixEqual } from './utils.js'
+import { expectMultiArrayEqual } from './utils.js'
 
 import stlucia from '../data/LCA.json'
 
@@ -18,6 +18,12 @@ describe('createParameters', function() {
       1000,
       1000
     );
+
+    const expected = {
+      ...default_params,
+      tt_vaccine_efficacy_infection: [0],
+      tt_vaccine_efficacy_disease: [0]
+    };
 
     const {
       population,
@@ -34,7 +40,7 @@ describe('createParameters', function() {
       ...unchanged
     } = actual._toOdin();
 
-    expect(unchanged).to.be.deep.equal(default_params);
+    expect(unchanged).to.be.deep.equal(expected);
   });
 
   it('can seed the population correctly', function() {
@@ -213,7 +219,7 @@ describe('createParameters', function() {
     expect(N_prioritisation_steps).to.be.equal(2);
   });
 
-  it('parameterises efficacy correctly', function() {
+  it('parameterises infection efficacy for one timestep', function() {
     const actual = createParameters(
       stlucia.population,
       stlucia.contactMatrix,
@@ -221,7 +227,7 @@ describe('createParameters', function() {
       3,
       1000,
       3000
-    ).withVaccineEfficacy(.7, .99);
+    ).withVaccineInfectionEfficacy([0], [.7]);
 
     const {
       vaccine_efficacy_infection,
@@ -229,36 +235,110 @@ describe('createParameters', function() {
       ...others
     } = actual._toOdin();
 
-    const defaultProbHosp = [0.000840764,0.001182411,0.001662887,0.002338607,
-      0.003288907,0.004625365,0.006504897,0.009148183,0.012865577,0.018093546,
-      0.025445917,0.035785947,0.050327683,0.0707785,0.099539573,0.1399878,
-      0.233470395];
-
-    const vaccinatedProbHosp = [0.0002522292,0.0003547233,0.0004988661,
-      0.0007015821,0.0009866721,0.0013876095,0.0019514691,0.0027444549,
-      0.0038596731,0.0054280638,0.0076337751,0.0107357841,0.0150983049,
-      0.0212335500,0.0298618719,0.0419963400,0.0700411185];
-
-    expectMatrixEqual(
+    expectMultiArrayEqual(
       vaccine_efficacy_infection,
       [
-        Array(17).fill(1),
-        Array(17).fill(1),
-        Array(17).fill(1),
-        Array(17).fill(.01),
-        Array(17).fill(.01),
-        Array(17).fill(1),
+        Array(17).fill([1]),
+        Array(17).fill([1]),
+        Array(17).fill([1]),
+        Array(17).fill([.3]),
+        Array(17).fill([.3]),
+        Array(17).fill([1]),
       ]
     )
+  });
 
-    expectMatrixEqual(
+  it('parameterises infection efficacy for three timesteps', function() {
+    const actual = createParameters(
+      stlucia.population,
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      3000
+    ).withVaccineInfectionEfficacy([0, 1, 2], [.7, .8, .9]);
+
+    const {
+      vaccine_efficacy_infection,
+      prob_hosp,
+      ...others
+    } = actual._toOdin();
+
+    expectMultiArrayEqual(
+      vaccine_efficacy_infection,
+      [
+        Array(17).fill([1, 1, 1]),
+        Array(17).fill([1, 1, 1]),
+        Array(17).fill([1, 1, 1]),
+        Array(17).fill([.3, .2, .1]),
+        Array(17).fill([.3, .2, .1]),
+        Array(17).fill([1, 1, 1]),
+      ]
+    )
+  });
+
+  it('parameterises vaccine disease efficacy for one timestep', function() {
+    const actual = createParameters(
+      stlucia.population,
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      3000
+    ).withVaccineDiseaseEfficacy([0], [.7]);
+
+    const {
+      prob_hosp,
+      ...others
+    } = actual._toOdin();
+
+    let defaultProbHosp = default_params.prob_hosp[0];
+    let vaccineProbHosp = defaultProbHosp.map(p => [p[0] * .3]);
+
+    expectMultiArrayEqual(
       prob_hosp,
       [
         defaultProbHosp,
         defaultProbHosp,
         defaultProbHosp,
-        vaccinatedProbHosp,
-        vaccinatedProbHosp,
+        vaccineProbHosp,
+        vaccineProbHosp,
+        defaultProbHosp
+      ]
+    )
+
+  });
+
+  it('parameterises vaccine disease efficacy for three timesteps', function() {
+    const actual = createParameters(
+      stlucia.population,
+      stlucia.contactMatrix,
+      0,
+      3,
+      1000,
+      3000
+    ).withVaccineDiseaseEfficacy([0, 1, 2], [.7, .8, .9]);
+
+    const {
+      prob_hosp,
+      ...others
+    } = actual._toOdin();
+
+    let defaultProbHosp = default_params.prob_hosp[0].map(
+      p => [p[0], p[0], p[0]]
+    );
+    let vaccineProbHosp = defaultProbHosp.map(
+      p => [p[0] * .3, p[0] * .2, p[0] * .1]
+    );
+
+    expectMultiArrayEqual(
+      prob_hosp,
+      [
+        defaultProbHosp,
+        defaultProbHosp,
+        defaultProbHosp,
+        vaccineProbHosp,
+        vaccineProbHosp,
         defaultProbHosp
       ]
     )
