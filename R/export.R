@@ -54,6 +54,7 @@ for (iso3c in names(countries)) {
     tt_vaccine = 0,
     dur_vaccine_delay = 7,
     vaccine_coverage_mat = vaccine_params$vaccine_coverage_mat,
+    rel_infectiousness_vaccinated = 0.5,
 
     # Health system capacity
     hosp_bed_capacity = 0,
